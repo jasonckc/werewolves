@@ -1,8 +1,16 @@
 import React from 'react';
+import socketIOClient from "socket.io-client";
 import logo from './logo.svg';
 import './App.css';
 
 function App() {
+  // Connect to the socket server.
+  const socket = socketIOClient("http://127.0.0.1:8000");
+
+  // Message example
+  socket.emit('createGame');
+
+  // Render the page.
   return (
     <div className="App">
       <header className="App-header">
