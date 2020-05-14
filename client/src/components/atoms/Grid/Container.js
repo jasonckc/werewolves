@@ -2,11 +2,10 @@ import styled from "styled-components";
 
 export const Container = styled.div`
 	width: 100%;
+	margin: 0  auto;
   box-sizing: border-box;
-	margin-left: auto;
-	margin-right: auto;
 
-	@media (min-width: 640px) {
+	@media (min-width: 576px) {
 		padding-left: 1rem;
 		padding-right: 1rem;
 	}

@@ -1,12 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Input } from '../atoms/Input/Input';
-import { Title } from '../atoms/Typography/Typography';
+import { Typography } from '../atoms';
 
  export const Field = ({ label, placeholder }) => {
   return (
     <div>
-      <Title> { label }</Title>
+      <Typography variant="label"> {label} </Typography>
       <Input type="text" placeholder={placeholder}/>
     </div>
   );

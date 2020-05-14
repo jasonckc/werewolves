@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 
 export const Button = styled.button`
   cursor: pointer;
-  display: inline-block;
   font-size: 16px;
   font-weight: 600;
   color: ${({ theme }) => theme.color.secondary.main};
@@ -12,7 +11,7 @@ export const Button = styled.button`
   border: 2px solid;
   border-color: ${({ theme }) => theme.color.secondary.main};
   padding: 0.5rem 1rem;
-  margin: 1rem;
+  margin: 1rem auto;
 `;
 
 export const ButtonLink = styled(Link)`

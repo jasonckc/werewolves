@@ -1,13 +1,13 @@
 import React from 'react';
-import { Container } from '../atoms/Grid/Container';
-import { Grid } from '../atoms/Grid/Grid';
-import { Button, ButtonLink } from '../atoms/Button/Button';
+import { Container, Grid, Button, ButtonLink } from '../atoms/index';
 
 const Home = () => {
   return (
     <Container>
-      <ButtonLink to="/create-game"> Create Game</ButtonLink>
-      <ButtonLink to="/join-game"> Join Game</ButtonLink>
+      <Grid container direction="column">
+        <ButtonLink to="/create-game"> Create Game</ButtonLink>
+        <ButtonLink to="/join-game"> Join Game</ButtonLink>
+      </Grid>
     </Container>
   );
 };

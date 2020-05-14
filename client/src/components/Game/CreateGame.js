@@ -1,17 +1,22 @@
 import React from 'react';
-import { Container } from '../atoms/Grid/Container';
 import { Field } from '../molecules/Field';
-import { Button } from '../atoms/Button/Button';
+import { Button, Container, Grid, Typography } from '../atoms/index';
+
 
 const CreateGame = () => {
   return (
     <Container>
-      Create game
-
-      <form>
-        <Field label="Username" placeholder="xyz" />
-        <Button> Start! </Button>
-      </form>
+      <Grid container direction="column">
+        <Grid item>
+          <Typography variant="title"> Create Game</Typography>
+        </Grid>
+        <Grid item>
+          <form>
+            <Field label="Username" placeholder="xyz" />
+            <Button> Start! </Button>
+          </form>
+        </Grid>
+      </Grid>
     </Container>
   );
 };
