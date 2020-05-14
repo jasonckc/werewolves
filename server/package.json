@@ -13,7 +13,9 @@
   "dependencies": {
     "debug": "~2.6.9",
     "nodemon": "^2.0.3",
-    "socket.io": "^2.3.0"
+    "shortid": "^2.2.15",
+    "socket.io": "^2.3.0",
+    "tedis": "^0.1.12"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",

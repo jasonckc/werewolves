@@ -7,8 +7,22 @@ function App() {
   // Connect to the socket server.
   const socket = socketIOClient("http://127.0.0.1:8000");
 
+  // Example handlers
+  socket.on('join-success', (id) => {
+    console.log(id);
+  });
+
+  socket.on('join-failed', () => {
+    console.log('Could not join...');
+  });
+
+  socket.on('player-joined', (player) => {
+    console.log(player);
+  })
+
   // Message example
-  socket.emit('createGame');
+  socket.emit('create-game', 'John');
+  // socket.emit('join-game', 'e4cBSpfnR', 'John');
 
   // Render the page.
   return (
