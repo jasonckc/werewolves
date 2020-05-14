@@ -3,6 +3,11 @@ import socketIOClient from "socket.io-client";
 import logo from './logo.svg';
 import './App.css';
 
+// Components
+import Navbar from './components/Navigation/Navbar';
+import Footer from './components/Navigation/Footer';
+import { Routes } from './routes';
+
 function App() {
   // Connect to the socket server.
   const socket = socketIOClient("http://127.0.0.1:8000");
@@ -13,20 +18,9 @@ function App() {
   // Render the page.
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Navbar/>
+      <Routes/>
+      <Footer/>
     </div>
   );
 }
