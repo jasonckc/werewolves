@@ -1,6 +1,7 @@
 import Player from "../objects/Player";
 import { Tedis } from "tedis";
 import * as settings from '../../settings';
+import Werewolves from "../Werewolves";
 
 /**
  * Player manager.
@@ -9,8 +10,10 @@ class PlayerManager {
 
     /**
      * Initializes the player manager.
+     *
+     * @param {Werewolves} app The application.
      */
-    constructor() {
+    constructor(app) {
         // Connect to redis.
         this._redis = new Tedis({
             port: settings.REDIS_PORT,
@@ -19,11 +22,18 @@ class PlayerManager {
 
         // Load the last player identifier.
         var key = 'PlayerManager_lastPlayerId';
-        this._redis.get(key).then((value) => {
-            this._lastPlayerId = value == null ? 0 : parseInt(value);
-        });
+        this._redis.get(key)
+            .then((value) => {
+                value = value === null ? 0 : parseInt(value);
+                this._lastPlayerId = value;
+            })
+            .catch((err) => {
+                console.error(err);
+                this._lastPlayerId = 0;
+            });
 
         // Initialize other attributes
+        this.app = app;
         this._lastPlayerId = null;
         this._socketByPlayerId = {};
     }
@@ -43,23 +53,21 @@ class PlayerManager {
         }
 
         // Instanciate the player object.
-        var player = new Player();
+        var player = new Player(this.app);
         player.id = this._lastPlayerId++;
         player.username = username;
         player.manager = this;
 
         // Save the last player identifier
-        var key = 'PlayerManager_lastPlayerId';
-        this._redis.set(key, this._lastPlayerId);
+        this._redis
+            .set('PlayerManager_lastPlayerId', this._lastPlayerId)
+            .catch((err) => { console.error(err); });
 
         // Save the socket.
         this._socketByPlayerId[player.id] = socket;
-        socket.on('disconnect', () => {
-            delete this._socketByPlayerId[player.id];
-        });
+        socket.on('disconnect', () => { this._onDisconnect(player); });
 
-        // Save and return the player.
-        this.save(player);
+        // Return the player.
         return player;
     }
 
@@ -87,14 +95,16 @@ class PlayerManager {
     }
 
     /**
-     * Saves a player.
+     * Handles the disconnection of a player.
      *
-     * @param {Player} player The player to save.
+     * @param {Player} player The player who was disconnected.
      */
-    save(player) {
-        var key = 'Player_' + player.id;
-        var val = player.serialize();
-        this._redis.setex(key, settings.OBJECT_LIFESPAN, val);
+    async _onDisconnect(player) {
+        delete this._socketByPlayerId[player.id];
+        if (player.gameId != null) {
+            var game = await this.app.games.get(player.gameId);
+            if (game != null) game.removePlayer(player.username);
+        }
     }
 }
 

@@ -6,10 +6,13 @@ class Player {
     /**
      * Initializes the player.
      *
+     * @param {Werewolves} app The application.
      * @param {string} string The string to deserialize.
      */
-    constructor(string) {
-        this.manager = null;
+    constructor(app, string = null) {
+        this.app = app;
+        this.gameId = null;
+
         this.id = null;
         this.username = null;
 
@@ -25,8 +28,8 @@ class Player {
      * @param {...any} args  The arguments of the message.
      */
     sendMessage(event, ...args) {
-        if (this.id != null && this.manager != null) {
-            this.manager.sendMessage(this, event, ...args);
+        if (this.id != null) {
+            this.app.players.sendMessage(this, event, ...args);
         }
     }
 
@@ -37,7 +40,7 @@ class Player {
      */
     isOnline() {
         if (this.id != null && this.manager != null) {
-            return this.manager.isPlayerOnline(this);
+            return this.app.players.isPlayerOnline(this);
         }
 
         return false;
@@ -57,7 +60,7 @@ class Player {
     }
 
     /**
-     * Serializes the game.
+     * Serializes the player.
      *
      * @returns A string representing the player.
      */
@@ -66,16 +69,21 @@ class Player {
     }
 
     /**
-     * Deserializes a game.
+     * Deserializes a player.
      *
-     * @param {string} string The string representing the player.
+     * @param {string|object} string The string representing the player.
      *
      * @returns This player.
      */
     deserialize(string) {
-        var obj = JSON.parse(string);
+        var obj = string;
+        if (typeof obj === 'string') {
+            obj = JSON.parse(string);
+        }
+
         this.id = obj.id;
         this.username = obj.username;
+
         return this;
     }
 }
