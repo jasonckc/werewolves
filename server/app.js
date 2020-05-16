@@ -6,12 +6,14 @@ var ww = new Werewolves();
 
 io.on("connection", (socket) => {
 
-  socket.on('create-game', (username) => {
-    ww.createGame(username, socket);
+  var player = null;
+
+  socket.on('create-game', async (username) => {
+    player = await ww.createGame(username, socket);
   });
 
-  socket.on('join-game', (gameId, username) => {
-    ww.joinGame(gameId, username, socket);
+  socket.on('join-game', async (gameId, username) => {
+    player = await ww.joinGame(gameId, username, socket);
   });
 
 });
