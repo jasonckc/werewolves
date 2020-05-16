@@ -1,21 +1,22 @@
 import React from 'react';
 import socketIOClient from "socket.io-client";
-import logo from './logo.svg';
 import './App.css';
+import { useStoreActions, useStoreState } from "easy-peasy";
+
+// Components
+import Navbar from './components/Navigation/Navbar';
+import Footer from './components/Navigation/Footer';
+import { Routes } from './routes';
+import { Snackbar } from './components/atoms';
+
+// Actions
 
 function App() {
+  const { setSocket } = useStoreActions((actions) => actions.game);
+
   // Connect to the socket server.
   const socket = socketIOClient("http://127.0.0.1:8000");
-
-  // Example handlers
-  socket.on('join-success', (id) => {
-    console.log(id);
-  });
-
-  socket.on('join-failed', () => {
-    console.log('Could not join...');
-  });
-
+  setSocket(socket);
   socket.on('player-joined', (player) => {
     console.log('player joined!');
     console.log(player);
@@ -33,20 +34,10 @@ function App() {
   // Render the page.
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Navbar/>
+      <Routes/>
+      <Footer/>
+      <Snackbar/>
     </div>
   );
 }
