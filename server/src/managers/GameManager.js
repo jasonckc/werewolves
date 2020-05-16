@@ -40,6 +40,18 @@ class GameManager {
     }
 
     /**
+     * Deletes a game.
+     *
+     * @param {Game} game The game to delete.
+     */
+    async delete(game) {
+        delete (this.instances[game.id]);
+        await this._redis
+            .del('Game_'.game.id)
+            .catch((err) => { console.error(err); })
+    }
+
+    /**
      * Searches a game with the given identifier.
      *
      * @param {string} id The game identifier.
