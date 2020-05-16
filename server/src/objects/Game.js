@@ -33,7 +33,7 @@ class Game {
      */
     addPlayer(player) {
         // The maximum number of players is 18.
-        if (this.players.size() >= 18) {
+        if (this.players.size >= 18) {
             player.sendMessage('join-failed');
             return false;
         }

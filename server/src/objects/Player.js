@@ -57,7 +57,7 @@ class Player {
         return {
             id: this.id,
             username: this.username,
-            role: role
+            role: this.role
         };
     }
 
