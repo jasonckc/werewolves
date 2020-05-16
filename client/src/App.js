@@ -18,6 +18,19 @@ function App() {
   // Connect to the socket server.
   const socket = socketIOClient("http://127.0.0.1:8000");
   setSocket(socket);
+  socket.on('player-joined', (player) => {
+    console.log('player joined!');
+    console.log(player);
+  });
+
+  socket.on('player-left', (player) => {
+    console.log('player left...');
+    console.log(player);
+  })
+
+  // Message example
+  // socket.emit('create-game', 'John');
+  socket.emit('join-game', 'sKOTiWhI0', 'John');
 
   // Render the page.
   return (

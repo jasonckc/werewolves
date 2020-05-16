@@ -10,8 +10,8 @@ class Werewolves {
      * Initializes the game.
      */
     constructor() {
-        this._games = new GameManager();
-        this._players = new PlayerManager();
+        this.games = new GameManager(this);
+        this.players = new PlayerManager(this);
     }
 
     /**
@@ -19,31 +19,26 @@ class Werewolves {
      *
      * @param {string} username The username of the owner.
      * @param {socket} socket   The socket to communicate with the owner.
+     *
+     * @returns The player object associated to the given socket.
      */
-    createGame(username, socket) {
+    async createGame(username, socket) {
         // Reject empty usernames
         if (typeof username !== 'string' || username === '') {
             socket.emit('join-failed');
-            return;
+            return null;
         }
-
-        // Instanciate the game.
-        var game = this._games.create();
 
         // Create the player object.
-        var player = this._players.create(username, socket);
+        var player = this.players.create(username, socket);
         if (player == null) {
             socket.emit('join-failed');
-            return;
+            return null;
         }
 
-        // Add the owner to the game.
-        if (game.addPlayer(player)) {
-            socket.emit('join-success', game.id);
-            game.broadcast('player-joined', player.toJSON());
-        } else {
-            socket.emit('join-failed');
-        }
+        // Create a game and add the player.
+        var game = await this.games.create();
+        return game.addPlayer(player) ? player : null;
     }
 
     /**
@@ -52,38 +47,32 @@ class Werewolves {
      * @param {string} gameId   The identifier of the game to join.
      * @param {string} username The username of the new player.
      * @param {socket} socket   The socket to communicate with the new player.
+     *
+     * @returns The player object associated to the given socket.
      */
-    joinGame(gameId, username, socket) {
-        console.log('joined')
+    async joinGame(gameId, username, socket) {
         // Reject empty usernames
         if (typeof username !== 'string' || username === '') {
             socket.emit('join-failed');
-            return;
+            return null;
         }
 
-        this._games.get(gameId).then((game) => {
+        // Search the game.
+        var game = await this.games.get(gameId);
+        if (game == null) {
+            socket.emit('join-failed');
+            return null;
+        }
 
-            // The requested game doesn't exist.
-            if (game == null) {
-                socket.emit('join-failed');
-                return;
-            }
+        // Create the player object.
+        var player = this.players.create(username, socket);
+        if (player == null) {
+            socket.emit('join-failed');
+            return null;
+        }
 
-            // Create the player object.
-            var player = this._players.create(username, socket);
-            if (player == null) {
-                socket.emit('join-failed');
-                return;
-            }
-
-            // Add the player to the game.
-            if (game.addPlayer(player)) {
-                player.sendMessage('join-success', game.id);
-                game.broadcast('player-joined', player.toJSON());
-            } else {
-                socket.emit('join-failed');
-            }
-        });
+        // Add the player to the game.
+        return game.addPlayer(player) ? player : null;
     }
 }
 
