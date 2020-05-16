@@ -54,6 +54,7 @@ class Werewolves {
      * @param {socket} socket   The socket to communicate with the new player.
      */
     joinGame(gameId, username, socket) {
+        console.log('joined')
         // Reject empty usernames
         if (typeof username !== 'string' || username === '') {
             socket.emit('join-failed');
