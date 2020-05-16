@@ -1,12 +1,12 @@
 import styled, { css } from 'styled-components';
 
-export const Typography = styled.p`
+export const Typography = styled.span`
+
   ${({ variant }) => {
     switch(variant) {
       case 'title': {
         return css`
           font-size: 30px;
-          color: blue;
         `;
       }
       case 'subtitle1': {
@@ -16,7 +16,9 @@ export const Typography = styled.p`
       }
       case 'label': {
         return css`
-          font-size: 18px;
+          font-size: 16px;
+          font-weight: 600;
+          color: ${({ theme }) => theme.color.primary.light};
         `;
       }
       default: {
@@ -26,5 +28,6 @@ export const Typography = styled.p`
       }
     }}
   };
-  color: ${({ theme }) => theme.color.primary.dark};
+  display: block;
+  padding-bottom: 1rem;
 `;

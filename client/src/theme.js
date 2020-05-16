@@ -11,7 +11,11 @@ const theme = {
       dark: "#c67100"
     },
     white: "#fff",
-    black: "#000"
+    black: "#000",
+
+    success: "#2e7d32",
+    warning: "#f9a825",
+    error: "#c62828",
   },
 }
 

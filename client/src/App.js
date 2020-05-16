@@ -12,7 +12,6 @@ import { Snackbar } from './components/atoms';
 // Actions
 
 function App() {
-  const { isOpen, message, variant } = useStoreState((state) => state.notifier);
   const { setSocket } = useStoreActions((actions) => actions.game);
 
   // Connect to the socket server.
@@ -38,7 +37,7 @@ function App() {
       <Navbar/>
       <Routes/>
       <Footer/>
-      {<Snackbar> test test </Snackbar>}
+      <Snackbar/>
     </div>
   );
 }

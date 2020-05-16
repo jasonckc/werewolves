@@ -4,7 +4,7 @@ import { Redirect } from 'react-router-dom';
 
 // Components
 import { Field } from '../molecules/Field';
-import { Button, Container, Grid, Typography, useInput } from '../atoms/index';
+import { Button, Container, Grid, Typography, useInput, Card, Fieldset } from '../atoms/index';
 
 const CreateGame = () => {
   const { input: { username }, handleInputChange, reset } = useInput({});
@@ -27,23 +27,27 @@ const CreateGame = () => {
 
   return (
     <Container>
-      <Grid container direction="column">
-        <Grid item>
-          <Typography variant="title"> Create Game</Typography>
+      <Card>
+        <Grid container direction="column">
+          <Grid item>
+            <Typography variant="title"> Create Game</Typography>
+          </Grid>
+          <Grid item>
+            <form onSubmit={createGameHandler}>
+              <Fieldset>
+                <Field 
+                  name="username"
+                  label="Username" 
+                  placeholder="xyz" 
+                  value={username} 
+                  onChange={handleInputChange} />
+              </Fieldset>
+  
+              <Button type="submit"> Start </Button>
+            </form>
+          </Grid>
         </Grid>
-        <Grid item>
-          <form onSubmit={createGameHandler}>
-            <Field 
-              name="username"
-              label="Username" 
-              placeholder="xyz" 
-              value={username} 
-              onChange={handleInputChange} />
-
-            <Button type="submit"> Start! </Button>
-          </form>
-        </Grid>
-      </Grid>
+      </Card>
     </Container>
   );
 };

@@ -20,6 +20,10 @@ const gameModel = {
     state.owner = payload;
   }),
   
+  setPlayers: action((state, payload) => {
+    state.players = payload;
+  }),
+
   addPlayer: action((state, payload) => {
     state.players.push(payload);
   }),
@@ -52,20 +56,20 @@ const gameModel = {
     async (actions, target, { getState, getStoreActions }) => {
       await getState().socket.on('join-failed', () => {
         getStoreActions().notifier.update({
-          message: "An error has occured"
+          message: "An error has occured",
+          variant: "error"
         })
       });
-
-      await getState().socket.on('player-joined', (player) => {
-        actions.setOwner(player);
-        actions.addPlayer(player);
-      });
   
-      await getState().socket.on('join-success', (id) => {
-        actions.setGameId(id);
-
+      await getState().socket.on('join-success', (game) => {
+        console.log('game', game)
+        actions.setGameId(game.id);
+        actions.setOwner(game.owner);
+        actions.setPlayers(game.players);
+        
         getStoreActions().notifier.update({
-          message: "Game successfully created"
+          message: "Game successfully created",
+          variant: "success"
         })
       })
     }
@@ -76,20 +80,19 @@ const gameModel = {
     async (actions, target, { getState, getStoreActions }) => {
       await getState().socket.on('join-failed', () => {
         getStoreActions().notifier.update({
-          message: "An error has occured"
+          message: "An error has occured",
+          variant: "error"
         })
       });
-
-      await getState().socket.on('player-joined', (player) => {
-        console.log('player joined', player)
-        actions.addPlayer(player);
-      });
   
-      await getState().socket.on('join-success', (id) => {
-        actions.setGameId(id);
+      await getState().socket.on('join-success', (game) => {
+        actions.setGameId(game.id);
+        actions.setOwner(game.owner);
+        actions.setPlayers(game.players);
 
         getStoreActions().notifier.update({
-          message: "You have joined the game"
+          message: "You have joined the game",
+          variant: "success"
         })
       })
     }
