@@ -9,8 +9,8 @@ class Game {
     /**
      * Initializes the game.
      *
-     * @param {Werewolves} app The application.
-     * @param string A serialized game.
+     * @param {Werewolves}      app    The application.
+     * @param {string | object} string A string or object to deserialize.
      */
     constructor(app, string = null) {
         this.app = app;
@@ -32,7 +32,11 @@ class Game {
      * @returns True if the player was added, false otherwise.
      */
     addPlayer(player) {
-        player.username += '_' + Object.keys(this.players).length;
+        // The maximum number of players is 18.
+        if (this.players.size() >= 18) {
+            player.sendMessage('join-failed');
+            return false;
+        }
 
         // Do not allow duplicate usernames.
         if (this.players[player.username] != null) {
@@ -68,11 +72,48 @@ class Game {
      * @param {string} username The username of the player to remove.
      */
     removePlayer(username) {
-        if (this.players[username] != null) {
+        if (this.players[username] == null) {
+            return;
+        }
+
+        if (username !== this.owner) {
             this.broadcast('player-left', this.players[username]);
-            delete(this.players[username]);
+            delete (this.players[username]);
             this.app.games.save(this);
         }
+    }
+
+    /**
+     * Starts the game.
+     */
+    async start() {
+        // The minimum number of players is 6
+        if (this.players.size() < 6) {
+            return;
+        }
+
+        this.broadcast('game-started');
+
+        // Assign roles
+        this._assignRoles();
+
+        // Show their role of each player.
+        Object.values(this.players).forEach((player) => {
+            // Determine who must know about the player's role.
+            var showRole = (p) => {
+                if (p.id = player.id) return true;
+                return p.role === 'werewolf' && player.role === 'werewolf';
+            }
+
+            // Send the role to every player that must be notified.
+            var username = player.username;
+            var role = player.role;
+            this.broadcastTo(showRole, 'player-role', username, role);
+        });
+
+        // While not victory
+        // Wolves vote
+        // Day
     }
 
     /**
@@ -157,6 +198,49 @@ class Game {
         });
 
         return this;
+    }
+
+    /**
+     * Assign a role to each player in the game.
+     */
+    _assignRoles() {
+        var nbPlayers = 16;// this.players.size();
+
+        // Determine the number of werewolves.
+        var nbWerewolves =
+            nbPlayers < 8 ? 1 :
+                nbPlayers < 12 ? 2 :
+                    nbPlayers < 18 ? 3 : 4;
+
+        // Generate the list of roles.
+        var roles = [];
+        for (let i = 0; i < nbPlayers; i++) {
+            roles.push(i < nbWerewolves ? 'werewolf' : 'villager');
+        }
+
+        // Shuffle the list of roles.
+        for (let i = roles.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * i);
+            const temp = roles[i];
+            roles[i] = roles[j];
+            roles[j] = temp;
+        }
+
+        // Assign the roles to the players
+        Object.values(this.players).forEach((player, i) => {
+            player.role = roles[i];
+        });
+    }
+
+    /**
+     * Waits for a number of seconds.
+     *
+     * @param {int} seconds The number of seconds.
+     */
+    async _wait(seconds) {
+        await new Promise((resolve) => {
+            setTimeout(resolve, seconds * 1000);
+        });
     }
 }
 

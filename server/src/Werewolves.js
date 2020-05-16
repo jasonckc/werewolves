@@ -74,6 +74,19 @@ class Werewolves {
         // Add the player to the game.
         return game.addPlayer(player) ? player : null;
     }
+
+    /**
+     * Starts a game.
+     *
+     * @param {Player} sender The player that requested the game start. Must be
+     *                        the owner of the game.
+     */
+    async startGame(sender) {
+        var game = await this.games.get(sender.gameId);
+        if (game != null && game.owner === sender.username) {
+            game.start();
+        }
+    }
 }
 
 export default Werewolves;
