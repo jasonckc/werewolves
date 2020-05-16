@@ -204,7 +204,7 @@ class Game {
      * Assign a role to each player in the game.
      */
     _assignRoles() {
-        var nbPlayers = 16;// this.players.size();
+        var nbPlayers = this.players.size();
 
         // Determine the number of werewolves.
         var nbWerewolves =
