@@ -22,7 +22,7 @@ class Steps {
 
         // Determine the number of werewolves.
         var nbWerewolves =
-            nbPlayers < 8 ? 1 :
+            nbPlayers < 4 ? 2 :
                 nbPlayers < 12 ? 2 :
                     nbPlayers < 18 ? 3 : 4;
 

@@ -17,15 +17,16 @@ function App() {
   // Connect to the socket server.
   const socket = socketIOClient("http://127.0.0.1:8000");
   setSocket(socket);
-  socket.on('player-joined', (player) => {
-    console.log('player joined!');
-    console.log(player);
-  });
 
-  socket.on('player-left', (player) => {
-    console.log('player left...');
-    console.log(player);
+  socket.on('game-started', () => {
+    console.log('game-started...');
   })
+  socket.on('player-role', (username, role) => {
+    console.log('player-role...');
+    console.log('username', username);
+    console.log('role2', role);
+  })
+
 
   // Message example
   // socket.emit('create-game', 'John');

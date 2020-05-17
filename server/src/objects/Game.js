@@ -148,7 +148,7 @@ class Game {
      */
     async start() {
         // The minimum number of players is 6
-        if (Object.keys(this.players).length < 6) {
+        if (Object.keys(this.players).length < 4) {
             return;
         }
 

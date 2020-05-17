@@ -1,20 +1,16 @@
 import React, { useEffect } from "react";
-import { Container, Grid, Typography, Card, CardHeader, CardBody, Button, CardFooter, Divider } from "../atoms";
+import { Redirect } from "react-router-dom";
 import { useStoreState, useStoreActions } from "easy-peasy";
 
+import { Container, Grid, Typography, Card, CardHeader, CardBody, Button, CardFooter, Divider } from "../atoms";
+
 const Lobby = () => {
-  // const id = 'gsd43';
-  // const players = [
-  //   { id: 1, username: "Jason1 "},
-  //   { id: 2, username: "Jason2 "},
-  //   { id: 3, username: "Jason3 "},
-  //   { id: 4, username: "Jason4 "},
-  // ]
-	// States
-  const { socket, id, self, owner, players } = useStoreState((state) => state.game);
+  
+  // States
+  const { socket, id, self, owner, players, step } = useStoreState((state) => state.game);
   
   // Actions
-	const { addPlayer, removePlayer } = useStoreActions((actions) => actions.game);
+	const { addPlayer, removePlayer, startGame, updateRole, updateStep } = useStoreActions((actions) => actions.game);
 	const { update } = useStoreActions((actions) => actions.notifier);
 
   // Listen to player-joined and re-render
@@ -28,18 +24,32 @@ const Lobby = () => {
     });
 
     socket.on('player-left', (player) => {
-      console.log('player left...');
-      console.log(player);
       removePlayer(player);
       update({
         message: `Player ${ player && player.username } has left the game`,
         variant: "warning"
       })
-    })
+    });
 
+    socket.on('player-role', (username, role) => {
+      updateRole({ username, role });
+      updateStep('start');
+      update({
+        message: "The game is starting!",
+        variant: "warning"
+      });
+    });
   }, []);
 
+  const startGameHandler = () => {
+    startGame();
+  }
+
   const isOwner = self === owner;
+
+  if (step === 'start') {
+    return <Redirect to='/game' />
+  }
 
 	return (
 		<Container>
@@ -60,7 +70,7 @@ const Lobby = () => {
         </CardBody>
         <Divider/>
         <CardFooter>
-          <Button type="submit" disabled={!isOwner}> { !isOwner ? "Waiting for owner to start" : "Start"} </Button>
+          <Button onClick={startGameHandler} disabled={!isOwner}> { !isOwner ? "Waiting for owner to start" : "Start"} </Button>
         </CardFooter>
       </Card>
 		</Container>

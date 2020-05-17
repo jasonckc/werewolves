@@ -1,12 +1,15 @@
-import { action, thunk, thunkOn, actionOn } from "easy-peasy";
+import { action, thunk, thunkOn, computed } from "easy-peasy";
 
 const gameModel = {
   socket: {},
 
   id: null,
+  players: [],
   owner: null,
   self: null,
-  players: [],
+
+  // Sequences
+  step: 'waiting',
 
   // Actions
   setSocket: action((state, payload) => {
@@ -33,14 +36,27 @@ const gameModel = {
     state.players.push(payload);
   }),
 
+  updateStep: action((state, payload) => {
+    state.step = payload;
+  }),
+
   /**
-   * Removes a player from the game.
-   *
-   * @param {string} payload The username of the player to remove.
-   */
+  * Removes a player from the game.
+  *
+  * @param {string} payload The username of the player to remove.
+  */
   removePlayer: action((state, payload) => {
     state.players = state.players.filter(player => player.id !== payload.id)
   }),
+  
+  /**
+  * Update a player role when start-game is called
+  *
+  * @param {obj} payload { username, role }.
+  */
+  updateRole: action((state, payload) => {
+    state.players = state.players.filter(player => player.username === payload.username ? player.role = payload.role : player);
+  }), 
 
   // Thunks
   createGame: thunk((actions, payload, { getState }) => {
@@ -63,6 +79,14 @@ const gameModel = {
       resolve(payload);
     })
   }),
+
+  startGame: thunk((actions, payload, { getState }) => {
+    return new Promise((resolve, reject) => {
+      getState().socket.emit('start-game');
+      
+      resolve(true);
+    })
+  }),
   
   // Listeners
   onCreateGame: thunkOn(
@@ -76,10 +100,11 @@ const gameModel = {
       });
   
       await getState().socket.on('join-success', (game) => {
+        console.log('game', game)
         actions.setGameId(game.id);
         actions.setOwner(game.owner);
-        actions.setSelf(game.owner);
         actions.setPlayers(game.players);
+        actions.setSelf(game.players[0]);
         
         getStoreActions().notifier.update({
           message: "Game successfully created",
@@ -102,7 +127,7 @@ const gameModel = {
       await getState().socket.on('join-success', (game) => {
         actions.setGameId(game.id);
         actions.setOwner(game.owner);
-        actions.setSelf(game.players[game.players.length - 1].username);
+        actions.setSelf(game.players[game.players.length - 1]);
         actions.setPlayers(game.players);
 
         getStoreActions().notifier.update({
@@ -112,6 +137,17 @@ const gameModel = {
       });
     }
   ),
+
+  // onStartGame: thunkOn(
+  //   actions => actions.startGame,
+  //   async (actions, target, { getState, getStoreActions }) => {
+  //     actions.updateStep('start');
+  //     getStoreActions().notifier.update({
+  //       message: "The game is starting!",
+  //       variant: "warning"
+  //     });
+  //   }
+  // ),
 };
 
 export default gameModel;

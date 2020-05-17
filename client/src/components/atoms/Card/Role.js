@@ -5,10 +5,10 @@ const werewolf = require("../../../images/werewolf.png");
 const villager = require("../../../images/villager.png");
 
 const getSrc = (player, self) => {
-	if (self.role === 'Villager') {
+	if (self.role === 'villager') {
     return villager;
-  } else if (self.role === 'Werewolf') {
-    if (player.role === 'Villager') {
+  } else if (self.role === 'werewolf') {
+    if (player.role === 'villager') {
       return villager;
     } else {
       return werewolf;
@@ -29,12 +29,12 @@ const Wrapper = styled.div`
 	}
 
 	${({ player, self }) => {
-		if (self.role === "Villager") {
+		if (self.role === "villager") {
 			return css`
 				background: ${({ theme }) => theme.color.blue};
 			`;
-		} else if (self.role === "Werewolf") {
-			if (player.role === "Villager") {
+		} else if (self.role === "werewolf") {
+			if (player.role === "villager") {
 				return css`
 					background: ${({ theme }) => theme.color.blue};
 				`;
