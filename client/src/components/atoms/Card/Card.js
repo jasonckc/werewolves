@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export const Card = styled.div`
   overflow: hidden;
-  padding: 2rem 1rem;
+  padding: 1rem;
   margin: 1rem auto;
   width: 300px;
   border: 1px solid gray;
@@ -10,13 +10,13 @@ export const Card = styled.div`
 `;
 
 export const CardHeader = styled.header`
-  padding: 1rem 0;
+  padding: 0.5rem 1rem 0.5rem;
 `;
 
 export const CardBody = styled.div`
-  padding: 0 1rem
+  padding: 1.5rem 1rem 1rem;
 `;
 
 export const CardFooter = styled.div`
-  padding: 1rem 0 0;
+  padding: 0.5rem 1rem 0;
 `;

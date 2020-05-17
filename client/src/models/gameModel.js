@@ -5,6 +5,7 @@ const gameModel = {
 
   id: null,
   owner: null,
+  self: null,
   players: [],
 
   // Actions
@@ -19,6 +20,10 @@ const gameModel = {
   setOwner: action((state, payload) => {
     state.owner = payload;
   }),
+
+  setSelf: action((state, payload) => {
+    state.self = payload;
+  }),
   
   setPlayers: action((state, payload) => {
     state.players = payload;
@@ -26,6 +31,15 @@ const gameModel = {
 
   addPlayer: action((state, payload) => {
     state.players.push(payload);
+  }),
+
+  /**
+   * Removes a player from the game.
+   *
+   * @param {string} payload The username of the player to remove.
+   */
+  removePlayer: action((state, payload) => {
+    state.players = state.players.filter(player => player.id !== payload.id)
   }),
 
   // Thunks
@@ -62,16 +76,16 @@ const gameModel = {
       });
   
       await getState().socket.on('join-success', (game) => {
-        console.log('game', game)
         actions.setGameId(game.id);
         actions.setOwner(game.owner);
+        actions.setSelf(game.owner);
         actions.setPlayers(game.players);
         
         getStoreActions().notifier.update({
           message: "Game successfully created",
           variant: "success"
         })
-      })
+      });
     }
   ),
 
@@ -88,13 +102,14 @@ const gameModel = {
       await getState().socket.on('join-success', (game) => {
         actions.setGameId(game.id);
         actions.setOwner(game.owner);
+        actions.setSelf(game.players[game.players.length - 1].username);
         actions.setPlayers(game.players);
 
         getStoreActions().notifier.update({
           message: "You have joined the game",
           variant: "success"
-        })
-      })
+        });
+      });
     }
   ),
 };

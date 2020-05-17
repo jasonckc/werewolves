@@ -61,13 +61,8 @@ export const Snackbar = () => {
 
 	// useEffect will run only one time
 	useEffect(() => {
-		const timer = window.setInterval(() => {
-      close();
-    }, 5000);
-    return () => { 
-      window.clearInterval(timer);
-    };
-	}, []);
+		setTimeout(() => close(), 7000)
+	}, [isOpen]);
 
 	return <div>{isOpen && <SnackbarWrapper variant={variant}> {message} </SnackbarWrapper>}</div>;
 };

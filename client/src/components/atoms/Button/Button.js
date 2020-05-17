@@ -31,20 +31,36 @@ export const Button = styled.button`
     animation-name: ${translate};
     animation-iteration-count: infinite;
     animation-direction: alternate;
+  };
+
+  &:disabled {
+    color: ${({ theme }) => theme.color.primary.white};
+    background: ${({ theme }) => theme.color.gray};
+    animation-name: none;
   }
 `;
 
 export const ButtonLink = styled(Link)`
   cursor: pointer;
-  display: inline-block;
   font-size: 16px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.color.secondary.main};
-  background: transparent;
-  border-radius: 3px;
-  border: 2px solid;
-  border-color: ${({ theme }) => theme.color.secondary.main};
-  padding: 0.5rem 1rem;
-  margin: 1rem;
-  text-decoration: none
+  font-weight: 400;
+  color: ${({ theme }) => theme.color.white};
+  background: ${({ theme }) => theme.color.primary.main};
+  border-radius: 5px;
+  border: none;
+  padding: 0.6rem 1.5rem;
+  margin: 1rem auto 1rem;
+  float: ${({ float }) => float};
+  letter-spacing: 1px;
+  min-width: 200px;
+  text-align: center;
+  text-decoration: none;
+
+  &:hover {
+    background: ${({ theme }) => theme.color.primary.dark};
+    animation-duration: 0.5s;
+    animation-name: ${translate};
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+  };
 `;

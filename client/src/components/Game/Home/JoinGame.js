@@ -3,8 +3,8 @@ import { useStoreActions, useStoreState } from "easy-peasy";
 import { Redirect } from 'react-router-dom';
 
 // Components
-import { Field } from "../molecules/Field";
-import { Button, Container, Grid, Typography, useInput, Card, Fieldset } from '../atoms/index';
+import { Field } from "../../molecules/Field";
+import { Button, Container, Grid, Typography, useInput, Card, Fieldset } from '../../atoms/index';
 
 const JoinGame = () => {
   const { input: { gameId, username }, handleInputChange, reset } = useInput({});
@@ -28,7 +28,7 @@ const JoinGame = () => {
 	return (
 		<Container>
 			<Card>
-				<Grid container direction="column">
+				<Grid container direction="column" alignContent="center">
 					<Grid item>
 						<Typography variant="title"> Join Game </Typography>
 					</Grid>
