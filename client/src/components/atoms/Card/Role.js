@@ -34,7 +34,7 @@ const Wrapper = styled.div`
 				background: ${({ theme }) => theme.color.blue};
 			`;
 		} else if (self.role === "werewolf") {
-			if (player.role === "villager") {
+			if (player.role === null) {
 				return css`
 					background: ${({ theme }) => theme.color.blue};
 				`;

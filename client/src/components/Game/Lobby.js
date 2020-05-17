@@ -45,7 +45,7 @@ const Lobby = () => {
     startGame();
   }
 
-  const isOwner = self === owner;
+  const isOwner = self && self.username === owner;
 
   if (step === 'start') {
     return <Redirect to='/game' />

@@ -56,6 +56,7 @@ const gameModel = {
   */
   updateRole: action((state, payload) => {
     state.players = state.players.filter(player => player.username === payload.username ? player.role = payload.role : player);
+    state.self = {...state.self, role: payload.role};
   }), 
 
   // Thunks
