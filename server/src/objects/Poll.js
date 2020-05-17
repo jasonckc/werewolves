@@ -15,6 +15,7 @@ class Poll {
     constructor(app, string = null) {
         this.app = app;
 
+        this.id = null;
         this._voters = [];
         this._options = [];
         this._timeLimit = null;
@@ -36,6 +37,7 @@ class Poll {
         // Do not set options if the poll is in progress.
         if (!this._inProgress) {
             this._options = options;
+            this.app.polls.save(this);
         }
     }
 
@@ -56,6 +58,8 @@ class Poll {
                 this._voters.push(voter);
             }
         });
+
+        this.app.polls.save(this);
     }
 
     /**
@@ -67,6 +71,7 @@ class Poll {
         // Do not set the time limit if the poll is in progress.
         if (!this._inProgress) {
             this._timeLimit = seconds;
+            this.app.polls.save(this);
         }
     }
 
@@ -76,21 +81,27 @@ class Poll {
      * @param {Player} voter  The player who voted.
      * @param {string} option The chosen option.
      */
-    vote(voter, option) {
+    async vote(voter, option) {
         // Cannot vote if the poll wasn't started.
-        if (!this._inProgress || !this._options.includes(option)) {
-            return false;
+        if (!this._inProgress) {
+            return;
+        }
+
+        // Don't vote if the player isn't among the voters or if the chosen
+        // option is invalid.
+        if (!this._isVoter(voter) || !this._options.includes(option)) {
+            return;
         }
 
         // Register the vote. Close the poll if all voters voted.
         this._votes[voter.id] = option;
-        this._inProgress = this._votes.length === this._voters.length;
+        var nbVotes = Object.keys(this._votes).length;
+        this._inProgress = nbVotes < this._voters.length;
 
-        // Notify the other players
-        var skipVoter = (v) => { return v.id !== voter.id; };
-        this.broadcastTo(skipVoter, 'poll-vote', voter.username, option);
+        await this.app.polls.save(this);
 
-        return true;
+        // Notify the players
+        this.broadcast('poll-voted', voter.username, option);
     }
 
     /**
@@ -113,6 +124,7 @@ class Poll {
         }
 
         this._inProgress = true;
+        await this.app.polls.save(this);
 
         // Notify all the voters that the voted has started.
         this.broadcast('poll-started', this.toJSON());
@@ -125,7 +137,7 @@ class Poll {
 
         // Return the promise.
         return new Promise(executor)
-            .then(() => { this._inProgress = false; })
+            .then(() => { this._inProgress = false; this.app.polls.save(this); })
             .then(() => { this.broadcast('poll-ended'); });
     }
 
@@ -202,12 +214,15 @@ class Poll {
      */
     toJSON() {
         var voters = [];
-        this._voters.forEach((v) => { voters.push(v.toJSON()); })
+        this._voters.forEach((v) => { voters.push(v.toJSON()); });
 
         return {
-            options: this.options,
-            timeLimit: this.timeLimit,
-            voters: voters
+            id: this.id,
+            options: this._options,
+            timeLimit: this._timeLimit,
+            voters: voters,
+            inProgress: this._inProgress,
+            votes: this._votes
         };
     }
 
@@ -221,8 +236,7 @@ class Poll {
     }
 
     /**
-     * Deserializes a poll. Note that votes aren't serialized. A deserialized
-     * poll is considered not started.
+     * Deserializes a poll.
      *
      * @param {string|object} string The string representing the poll.
      *
@@ -234,12 +248,18 @@ class Poll {
             obj = JSON.parse(string);
         }
 
+        this._voters = []
         obj.voters.forEach((v) => {
             this._voters.push(new Player(this.app, v));
         })
 
+        this.id = obj.id;
         this._options = obj.options;
         this._timeLimit = obj.timeLimit;
+        this._inProgress = obj.inProgress;
+        this._votes = obj.votes;
+
+        return this;
     }
 
     /**
@@ -249,7 +269,11 @@ class Poll {
      *                                   over.
      * @param {number}     pollFrequency The polling frequency in milliseconds.
      */
-    _waitAllVoters(callback, pollFrequency = 5) {
+    async _waitAllVoters(callback, pollFrequency = 5) {
+        // Synchronize the poll to get the latest data.
+        await this.app.polls.synchronize(this);
+
+        // Determine whether the poll is over or not.
         if (!this._inProgress) {
             callback();
         } else {
@@ -259,6 +283,20 @@ class Poll {
         }
     }
 
+    /**
+     * Checks whether a player is a voter or not.
+     *
+     * @param {Player} player The player to check.
+     */
+    _isVoter(player) {
+        var isVoter = false;
+
+        this._voters.forEach((v) => {
+            isVoter |= v.id === player.id;
+        });
+
+        return isVoter;
+    }
 }
 
 export default Poll;

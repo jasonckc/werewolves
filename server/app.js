@@ -20,4 +20,8 @@ io.on("connection", (socket) => {
         if (player != null) ww.startGame(player);
     });
 
+    socket.on('poll-vote', async (option) => {
+        if (player != null) ww.vote(player, option);
+    });
+
 });

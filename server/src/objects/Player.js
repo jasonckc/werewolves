@@ -16,6 +16,7 @@ class Player {
         this.id = null;
         this.username = null;
         this.role = null;
+        this.isAlive = true;
 
         if (string != null) {
             this.deserialize(string);
@@ -57,7 +58,8 @@ class Player {
         return {
             id: this.id,
             username: this.username,
-            role: this.role
+            role: this.role,
+            isAlive: true
         };
     }
 
@@ -86,6 +88,7 @@ class Player {
         this.id = obj.id;
         this.username = obj.username;
         this.role = obj.role;
+        this.isAlive = obj.isAlive;
 
         return this;
     }

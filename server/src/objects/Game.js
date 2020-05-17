@@ -1,5 +1,6 @@
 import Player from "./Player";
 import Werewolves from "../Werewolves";
+import Steps from "./Steps";
 
 /**
  * Game model.
@@ -14,14 +15,55 @@ class Game {
      */
     constructor(app, string = null) {
         this.app = app;
+        this.steps = new Steps(this);
 
         this.id = null;
         this.players = {};
         this.owner = null;
+        this.pollId = null;
 
         if (string != null) {
             this.deserialize(string);
         }
+    }
+
+    /**
+     * Returns the winning role.
+     *
+     * @returns The winning role.
+     */
+    get winners() {
+        // Count the number of players for each role.
+        var nbAliveWerewolves = 0;
+        var nbAliveVillagers = 0;
+
+        Object.values(this.players).forEach((p) => {
+            // Skip dead players.
+            if (!p.isAlive) return;
+
+            // Count the players.
+            if (p.role === 'werewolf') nbAliveWerewolves++;
+            else if (p.role === 'villager') nbAliveVillagers++;
+        });
+
+        // Return null if no roles have been assigned.
+        if (nbAliveVillagers == 0 && nbAliveWerewolves == 0) {
+            return null;
+        }
+
+        // All werewolves are dead: villagers won!
+        if (nbAliveWerewolves == 0) {
+            return 'villager';
+        }
+
+        // There are either the same number or more werewolves than villagers:
+        // werewolves won!
+        if (nbAliveWerewolves >= nbAliveVillagers) {
+            return 'werewolf';
+        }
+
+        // Return the winning role.
+        return null;
     }
 
     /**
@@ -84,36 +126,99 @@ class Game {
     }
 
     /**
+     * Returns the list of players.
+     *
+     * @param {(Player) => boolean} filter A function used to filter player.
+     *                                     Returns true if the player must
+     *                                     be in the list, false otherwise.
+     *
+     * @returns A list of player objects.
+     */
+    getPlayers(filter = null) {
+        var players = [];
+
+        Object.values(this.players)
+            .forEach((p) => { if (filter(p)) players.push(p); });
+
+        return players;
+    }
+
+    /**
      * Starts the game.
      */
     async start() {
         // The minimum number of players is 6
-        if (this.players.size() < 6) {
+        if (Object.keys(this.players).length < 6) {
             return;
         }
 
         this.broadcast('game-started');
 
         // Assign roles
-        this._assignRoles();
-
-        // Show their role of each player.
-        Object.values(this.players).forEach((player) => {
-            // Determine who must know about the player's role.
-            var showRole = (p) => {
-                if (p.id = player.id) return true;
-                return p.role === 'werewolf' && player.role === 'werewolf';
-            }
-
-            // Send the role to every player that must be notified.
-            var username = player.username;
-            var role = player.role;
-            this.broadcastTo(showRole, 'player-role', username, role);
-        });
+        this.steps.assignRoles();
+        await this.steps.waitRoleAcknowlegement();
 
         // While not victory
-        // Wolves vote
-        // Day
+        while (this.winners == null) {
+            await this.steps.night();
+
+            if (this.winners == null) await this.steps.day();
+            else break;
+        }
+
+        this.broadcast('game-ended', this.winners);
+    }
+
+    /**
+     * Starts a poll.
+     *
+     * @param {string[]}            options       The options of the poll.
+     * @param {(Player) => boolean} filterPlayers A function that returns true
+     *                                            if the player must be a voter
+     *                                            or false otherwise.
+     *
+     * @returns The option with the most votes. If no one voted, returns a
+     * random option. If there is a tie, returns a random option from among
+     * those with the most votes.
+     */
+    async startPoll(options, filterPlayers = null) {
+        return await this.startTimedPoll(options, null, filterPlayers);
+    }
+
+    /**
+     * Starts a timed poll.
+     *
+     * @param {string[]}            options       The options of the poll.
+     * @param {number}              timeLimit     The duration of the poll in
+     *                                            seconds.
+     * @param {(Player) => boolean} filterPlayers A function that returns true
+     *                                            if the player must be a voter
+     *                                            or false otherwise.
+     *
+     * @returns The option with the most votes. If no one voted, returns a
+     * random option. If there is a tie, returns a random option from among
+     * those with the most votes.
+     */
+    async startTimedPoll(options, timeLimit, filterPlayers = null) {
+        var voters = [];
+        Object.values(this.players).forEach((p) => {
+            if (filterPlayers === null || filterPlayers(p)) {
+                voters.push(p);
+            }
+        })
+
+        var poll = await this.app.polls.create();
+        this.pollId = poll.id;
+        this.app.games.save(this);
+
+        poll.options = options;
+        poll.voters = voters;
+        poll.timeLimit = timeLimit;
+
+        await poll.start();
+        this.pollId = null;
+
+        return poll.result();
     }
 
     /**
@@ -153,14 +258,15 @@ class Game {
         // Convert the players to JSON.
         var players = [];
         Object.values(this.players).forEach((player) => {
-            players.push(player);
+            players.push(player.toJSON());
         });
 
         // Convert to JSON.
         return {
             id: this.id,
             players: players,
-            owner: this.owner
+            owner: this.owner,
+            pollId: this.pollId
         }
     }
 
@@ -190,57 +296,14 @@ class Game {
         // Deserialize the game's attributes.
         this.id = obj.id;
         this.owner = obj.owner;
+        this.pollId = obj.pollId;
 
         // Deserialize the players.
         obj.players.forEach((p) => {
             this.players[p.username] = new Player(this.app, p);
-            this.players[p.username].gameId = this.id;
         });
 
         return this;
-    }
-
-    /**
-     * Assign a role to each player in the game.
-     */
-    _assignRoles() {
-        var nbPlayers = this.players.size();
-
-        // Determine the number of werewolves.
-        var nbWerewolves =
-            nbPlayers < 8 ? 1 :
-                nbPlayers < 12 ? 2 :
-                    nbPlayers < 18 ? 3 : 4;
-
-        // Generate the list of roles.
-        var roles = [];
-        for (let i = 0; i < nbPlayers; i++) {
-            roles.push(i < nbWerewolves ? 'werewolf' : 'villager');
-        }
-
-        // Shuffle the list of roles.
-        for (let i = roles.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * i);
-            const temp = roles[i];
-            roles[i] = roles[j];
-            roles[j] = temp;
-        }
-
-        // Assign the roles to the players
-        Object.values(this.players).forEach((player, i) => {
-            player.role = roles[i];
-        });
-    }
-
-    /**
-     * Waits for a number of seconds.
-     *
-     * @param {int} seconds The number of seconds.
-     */
-    async _wait(seconds) {
-        await new Promise((resolve) => {
-            setTimeout(resolve, seconds * 1000);
-        });
     }
 }
 
