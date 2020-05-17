@@ -22,7 +22,6 @@ class GameManager {
         });
 
         this.app = app;
-        this.instances = {};
     }
 
     /**
@@ -40,29 +39,52 @@ class GameManager {
     }
 
     /**
+     * Deletes a game.
+     *
+     * @param {Game} game The game to delete.
+     */
+    async delete(game) {
+        await this._redis
+            .del('Game_'.game.id)
+            .catch((err) => { console.error(err); })
+    }
+
+    /**
      * Searches a game with the given identifier.
      *
      * @param {string} id The game identifier.
      */
     async get(id) {
+        if (id === null) {
+            return null;
+        }
+
+        var game = new Game(this.app);
+        game.id = id;
+        return await this.synchronize(game) ? game : null;
+    }
+
+    /**
+     * Synchronizes a game object with the database.
+     *
+     * @param {Game} game The game to synchronize.
+     *
+     * @returns True is the game was synchronized, false otherwise.
+     */
+    async synchronize(game) {
         // Get the game from redis.
         var value = await this._redis
-            .get('Game_' + id)
+            .get('Game_' + game.id)
             .catch((err) => { console.error(err); value = null; });
 
         // The game doesn't exist.
         if (value == null) {
-            if (this.instances[id] != null) delete (this.instances[id]);
-            return null;
+            return false;
         }
 
-        // Create the instance of the game.
-        if (this.instances[id] == null) {
-            this.instances[id] = new Game(this.app);
-        }
-
-        // Update the instance
-        return this.instances[id].deserialize(value);
+        // Synchronize the game.
+        game.deserialize(value);
+        return true;
     }
 
     /**
@@ -73,6 +95,10 @@ class GameManager {
      * @returns True if the game was saved, false otherwise.
      */
     async save(game) {
+        if (game.id === null) {
+            return;
+        }
+
         var key = 'Game_' + game.id;
         var val = game.serialize();
 

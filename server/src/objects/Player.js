@@ -6,8 +6,8 @@ class Player {
     /**
      * Initializes the player.
      *
-     * @param {Werewolves} app The application.
-     * @param {string} string The string to deserialize.
+     * @param {Werewolves}      app    The application.
+     * @param {string | object} string The string or object to deserialize.
      */
     constructor(app, string = null) {
         this.app = app;
@@ -15,6 +15,8 @@ class Player {
 
         this.id = null;
         this.username = null;
+        this.role = null;
+        this.isAlive = true;
 
         if (string != null) {
             this.deserialize(string);
@@ -28,7 +30,7 @@ class Player {
      * @param {...any} args  The arguments of the message.
      */
     sendMessage(event, ...args) {
-        if (this.id != null) {
+        if (this.app != null && this.id != null) {
             this.app.players.sendMessage(this, event, ...args);
         }
     }
@@ -55,7 +57,9 @@ class Player {
     toJSON() {
         return {
             id: this.id,
-            username: this.username
+            username: this.username,
+            role: this.role,
+            isAlive: true
         };
     }
 
@@ -83,6 +87,8 @@ class Player {
 
         this.id = obj.id;
         this.username = obj.username;
+        this.role = obj.role;
+        this.isAlive = obj.isAlive;
 
         return this;
     }

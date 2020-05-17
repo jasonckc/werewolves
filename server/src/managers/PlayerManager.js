@@ -20,21 +20,8 @@ class PlayerManager {
             host: settings.REDIS_HOST
         });
 
-        // Load the last player identifier.
-        var key = 'PlayerManager_lastPlayerId';
-        this._redis.get(key)
-            .then((value) => {
-                value = value === null ? 0 : parseInt(value);
-                this._lastPlayerId = value;
-            })
-            .catch((err) => {
-                console.error(err);
-                this._lastPlayerId = 0;
-            });
-
         // Initialize other attributes
         this.app = app;
-        this._lastPlayerId = null;
         this._socketByPlayerId = {};
     }
 
@@ -46,26 +33,29 @@ class PlayerManager {
      *
      * @returns The created player.
      */
-    create(username, socket) {
-        // The manager is not yet initialized.
-        if (this._lastPlayerId == null) {
-            return null;
-        }
+    async create(username, socket) {
+        // Load the last player identifier.
+        var lastId = await this._redis
+            .get('PlayerManager_Id')
+            .catch((err) => { console.error(err); });
+
+        lastId = lastId === null ? 0 : parseInt(lastId);
 
         // Instanciate the player object.
         var player = new Player(this.app);
-        player.id = this._lastPlayerId++;
+        player.id = lastId + 1;
         player.username = username;
-        player.manager = this;
 
         // Save the last player identifier
-        this._redis
-            .set('PlayerManager_lastPlayerId', this._lastPlayerId)
+        await this._redis
+            .setex('PlayerManager_Id', settings.OBJECT_LIFESPAN, player.id)
             .catch((err) => { console.error(err); });
 
         // Save the socket.
-        this._socketByPlayerId[player.id] = socket;
-        socket.on('disconnect', () => { this._onDisconnect(player); });
+        if (socket != null) {
+            this._socketByPlayerId[player.id] = socket;
+            socket.on('disconnect', () => { this._onDisconnect(player); });
+        }
 
         // Return the player.
         return player;
