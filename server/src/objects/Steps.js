@@ -42,17 +42,21 @@ class Steps {
 
 
         // Assign the roles to the players
+        Object.values(this.game.players)
+            .forEach((player, i) => { player.role = roles[i]; });
+
+        // Notify the players
         Object.values(this.game.players).forEach((player, i) => {
-            // Determine which player should be notified of a player's.
+            // Determine which player should be notified of a player's role.
             var showRole = (p) => {
                 if (p.id == player.id) return true;
                 return p.role === 'werewolf' && player.role === 'werewolf';
             }
 
-            // Notify the players.
-            player.role = roles[i];
+            // Send a message to the appropriate players.
             var username = player.username;
-            this.game.broadcastTo(showRole, 'player-role', username, roles[i]);
+            var role = player.role;
+            this.game.broadcastTo(showRole, 'player-role', username, role);
         });
     }
 
