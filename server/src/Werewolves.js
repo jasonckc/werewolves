@@ -65,7 +65,9 @@ class Werewolves {
 
         // Reject empty usernames.
         if (typeof username !== 'string' || username === '') {
-            if (socket != null) socket.emit('join-failed');
+            if (socket != null) {
+                socket.emit('join-failed', 'invalidUsername');
+            }
             return;
         }
 
@@ -74,7 +76,9 @@ class Werewolves {
             // Search the game.
             var game = await this.games.get(gameId);
             if (game == null) {
-                if (socket != null) socket.emit('join-failed');
+                if (socket != null) {
+                    socket.emit('join-failed', 'gameDoesNotExist');
+                }
                 done();
                 return;
             }
@@ -82,7 +86,9 @@ class Werewolves {
             // Create the player object.
             var player = await this.players.create(username, socket);
             if (player == null) {
-                if (socket != null) socket.emit('join-failed');
+                if (socket != null) {
+                    socket.emit('join-failed', 'internalError');
+                }
                 done();
                 return;
             }
