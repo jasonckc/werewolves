@@ -113,16 +113,21 @@ class Game {
      *
      * @param {string} username The username of the player to remove.
      */
-    removePlayer(username) {
+    async removePlayer(username) {
         if (this.players[username] == null) {
             return;
         }
 
-        if (username !== this.owner) {
-            this.broadcast('player-left', this.players[username]);
-            delete (this.players[username]);
-            this.app.games.save(this);
+        // If there is an ongoing poll, remove the player from the poll.
+        if (this.pollId != null) {
+            var poll = await this.app.polls.get(this.pollId);
+            if (poll != null) poll.removeVoter(this.players[username]);
         }
+
+        // Remove the player and notify the other players.
+        this.broadcast('player-left', this.players[username]);
+        delete (this.players[username]);
+        this.app.games.save(this);
     }
 
     /**
@@ -148,9 +153,9 @@ class Game {
      */
     async start() {
         // The minimum number of players is 6
-        if (Object.keys(this.players).length < 6) {
-            return;
-        }
+        // if (Object.keys(this.players).length < 6) {
+        //     return;
+        // }
 
         this.broadcast('game-started');
 
