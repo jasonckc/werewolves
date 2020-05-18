@@ -76,13 +76,13 @@ class Game {
     addPlayer(player) {
         // The maximum number of players is 18.
         if (this.players.size >= 18) {
-            player.sendMessage('join-failed');
+            player.sendMessage('join-failed', 'roomFull');
             return false;
         }
 
         // Do not allow duplicate usernames.
         if (this.players[player.username] != null) {
-            player.sendMessage('join-failed');
+            player.sendMessage('join-failed', 'duplicateUsername');
             return false;
         }
 
