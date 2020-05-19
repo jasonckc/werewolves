@@ -10,7 +10,7 @@ const Lobby = () => {
   const { socket, id, self, owner, players, step } = useStoreState((state) => state.game);
   
   // Actions
-	const { addPlayer, removePlayer, startGame, updateRole, updateStep } = useStoreActions((actions) => actions.game);
+	const { addPlayer, removePlayer, startGame, updatePlayer, updateStep } = useStoreActions((actions) => actions.game);
 	const { update } = useStoreActions((actions) => actions.notifier);
 
   // Listen to player-joined and re-render
@@ -32,7 +32,7 @@ const Lobby = () => {
     });
 
     socket.on('player-role', (username, role) => {
-      updateRole({ username, role });
+      updatePlayer({ username, key: 'role', value: role });
       updateStep('start');
       update({
         message: "The game is starting!",
@@ -70,7 +70,14 @@ const Lobby = () => {
         </CardBody>
         <Divider/>
         <CardFooter>
-          <Button onClick={startGameHandler} disabled={!isOwner}> { !isOwner ? "Waiting for owner to start" : "Start"} </Button>
+          <Button 
+            width="100%"
+            onClick={startGameHandler} 
+            disabled={!isOwner}> 
+            
+            { !isOwner ? "Waiting for owner to start" : "Start"} 
+            
+          </Button>
         </CardFooter>
       </Card>
 		</Container>

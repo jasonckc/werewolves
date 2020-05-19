@@ -1,6 +1,8 @@
 import { action, thunk, thunkOn, computed } from "easy-peasy";
 
 const gameModel = {
+
+  // States
   socket: {},
 
   id: null,
@@ -8,8 +10,12 @@ const gameModel = {
   owner: null,
   self: null,
 
-  // Sequences
-  step: 'waiting',
+  step: 'waiting',  // Sequence: waiting, ready, night, day
+  poll: null,
+
+  nightCount: 0,
+
+  gameHistory: [],
 
   // Actions
   setSocket: action((state, payload) => {
@@ -54,10 +60,25 @@ const gameModel = {
   *
   * @param {obj} payload { username, role }.
   */
-  updateRole: action((state, payload) => {
-    state.players = state.players.filter(player => player.username === payload.username ? player.role = payload.role : player);
-    state.self = {...state.self, role: payload.role};
+  updatePlayer: action((state, payload) => {
+    const { username, key, value } = payload;
+
+    state.players = state.players.filter(player => player.username === username ? player[key] = value : player);
+    state.self = {...state.self, [key]: value};
   }), 
+
+  /**
+   * Save the poll instance. There's only one at any time
+   *
+   * @param {obj} payload { poll }.
+   */
+  setPoll: action((state, payload) => {
+    state.poll = payload
+  }),
+
+  updateGameHistory: action((state, payload) => {
+    state.gameHistory = [...state.gameHistory, payload];
+  }),
 
   // Thunks
   createGame: thunk((actions, payload, { getState }) => {
@@ -85,6 +106,15 @@ const gameModel = {
     return new Promise((resolve, reject) => {
       getState().socket.emit('start-game');
       
+      resolve(true);
+    })
+  }),
+
+  playerVote: thunk((actions, payload, { getState }) => {
+    const { option } = payload;
+    console.log('option', option)
+    return new Promise((resolve, reject) => {
+      getState().socket.emit('poll-vote', option);
       resolve(true);
     })
   }),
@@ -138,17 +168,6 @@ const gameModel = {
       });
     }
   ),
-
-  // onStartGame: thunkOn(
-  //   actions => actions.startGame,
-  //   async (actions, target, { getState, getStoreActions }) => {
-  //     actions.updateStep('start');
-  //     getStoreActions().notifier.update({
-  //       message: "The game is starting!",
-  //       variant: "warning"
-  //     });
-  //   }
-  // ),
 };
 
 export default gameModel;

@@ -12,6 +12,7 @@ const translate = keyframes`
 `;
 
 export const Button = styled.button`
+  display: block;
   cursor: pointer;
   font-size: 16px;
   font-weight: 400;
@@ -21,9 +22,10 @@ export const Button = styled.button`
   border: none;
   padding: 0.6rem 1.5rem;
   margin: 1rem auto 1rem;
-  float: ${({ float }) => float};
   letter-spacing: 1px;
-  width: 100%;
+  float: ${({ float }) => float};
+  width: ${({ width }) => width};
+;
 
   &:hover {
     background: ${({ theme }) => theme.color.secondary.dark};

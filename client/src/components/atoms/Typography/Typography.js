@@ -23,6 +23,12 @@ export const Typography = styled.span`
           font-size: 24px;
         `;
       }
+      case 'subtitle2': {
+        return css`
+          font-size: 22px;
+          color: ${({ theme }) => theme.color.primary.main};
+        `;
+      }
       case 'body1': {
         return css`
           font-size: 18px;
@@ -42,6 +48,8 @@ export const Typography = styled.span`
       }
     }}
   };
+
+  ${({ align }) => align && css`text-align: ${align}`};
   display: block;
   padding-bottom: 1rem;
 `;

@@ -21,12 +21,13 @@ function App() {
   socket.on('game-started', () => {
     console.log('game-started...');
   })
-  socket.on('player-role', (username, role) => {
-    console.log('player-role...');
-    console.log('username', username);
-    console.log('role2', role);
-  })
 
+  
+  
+  socket.on('poll-started', (poll) => {
+    console.log('poll-started');
+    console.log('poll', poll);
+  });
 
   // Message example
   // socket.emit('create-game', 'John');

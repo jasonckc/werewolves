@@ -3,17 +3,22 @@ import styled, { css } from "styled-components";
 
 const werewolf = require("../../../images/werewolf.png");
 const villager = require("../../../images/villager.png");
+const unknown = require("../../../images/unknown.png");
 
 const getSrc = (player, self) => {
-	if (self.role === 'villager') {
-    return villager;
-  } else if (self.role === 'werewolf') {
-    if (player.role === 'villager') {
-      return villager;
-    } else {
-      return werewolf;
-    }
-  }
+	if (self.role === "villager") {
+		if (self.username === player.username) {
+			return villager;
+		} else {
+			return unknown;
+		}
+	} else if (self.role === "werewolf") {
+		if (player.role === null) {
+			return villager;
+		} else {
+			return werewolf;
+		}
+	}
 };
 
 const Wrapper = styled.div`
@@ -30,18 +35,30 @@ const Wrapper = styled.div`
 
 	${({ player, self }) => {
 		if (self.role === "villager") {
-			return css`
-				background: ${({ theme }) => theme.color.blue};
-			`;
-		} else if (self.role === "werewolf") {
-			if (player.role === null) {
+			if (self.username === player.username) {
 				return css`
-					background: ${({ theme }) => theme.color.blue};
+					background: ${({ theme }) => theme.color.blue600};
 				`;
 			} else {
 				return css`
-					background: ${({ theme }) => theme.color.red};
+					background: ${({ theme }) => theme.color.blue400};
 				`;
+			}
+		} else if (self.role === "werewolf") {
+			if (player.role === null) {
+				return css`
+					background: ${({ theme }) => theme.color.blue400};
+				`;
+			} else {
+				if (self.username === player.username) {
+					return css`
+						background: ${({ theme }) => theme.color.red600};
+					`;
+				} else {
+					return css`
+						background: ${({ theme }) => theme.color.red400};
+					`;
+				}
 			}
 		}
 	}};
@@ -67,7 +84,7 @@ const Username = styled.div`
 export const Role = ({ player, self }) => {
 	return (
 		<Wrapper player={player} self={self}>
-			<Image src={getSrc(player, self)} />
+			<Image src={getSrc(player, self)}></Image>
 			<Username> {player.username} </Username>
 		</Wrapper>
 	);

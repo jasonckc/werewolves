@@ -43,7 +43,7 @@ const CreateGame = () => {
                   onChange={handleInputChange} />
               </Fieldset>
   
-              <Button type="submit"> Start </Button>
+              <Button type="submit" width="100%"> Start </Button>
             </form>
           </Grid>
         </Grid>

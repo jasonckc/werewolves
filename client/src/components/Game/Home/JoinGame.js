@@ -53,7 +53,7 @@ const JoinGame = () => {
 		              onChange={handleInputChange}  />
 							</Fieldset>
 	
-							<Button type="submit"> Join </Button>
+							<Button type="submit" width="100%"> Join </Button>
 						</form>
 					</Grid>
 				</Grid>

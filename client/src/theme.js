@@ -13,8 +13,10 @@ const theme = {
     white: "#fff",
     black: "#000",
     gray: "#ddd",
-    red: "#e57373",
-    blue: "#7986cb",
+    red400: "#e57373",
+    blue400: "#5c6bc0",
+    red600: "#e53935",
+    blue600: "#3949ab",
 
     success: "#2e7d32",
     warning: "#f9a825",
