@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useStoreState, useStoreActions } from "easy-peasy";
-import styled, { css } from "styled-components";
 
 // Components
-import { Container, Grid, Button } from "../../atoms";
+import { Container, Grid } from "../../atoms";
 import Roles from "./Roles";
 import Narrator from "./Narrator";
 import GameHistory from "./GameHistory";
 
 const Game = () => {
-
 	// States
 	const { socket, step, self, nightCount, dayCount } = useStoreState((state) => state.game);
+
+	// Actions
 	const { setPoll, updatePlayer, updateStep, updateGameHistory, updateNarrator } = useStoreActions(
 		(actions) => actions.game
 	);

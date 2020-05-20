@@ -1,12 +1,12 @@
-import React, { Fragment, useState } from "react";
+import React, { useState } from "react";
 import { useStoreState, useStoreActions } from "easy-peasy";
 
 // Components
 import { Grid, Role, Button } from "../../atoms";
 
 const Roles = () => {
-	const { socket, step, self, players, poll } = useStoreState((state) => state.game);
-	const { setPoll, playerVote, updatePlayer, updateGameHistory } = useStoreActions((actions) => actions.game);
+	const { step, self, players, poll } = useStoreState((state) => state.game);
+	const { playerVote } = useStoreActions((actions) => actions.game);
 
 	const [ voteIndex, setVoteIndex ] = useState(-1);
 
@@ -15,16 +15,16 @@ const Roles = () => {
 	};
 
 	const werewolfVoteHandler = (username, playerIndex) => {
-    console.log('werewolfvote', username);
-    let pollIndex = poll.options.findIndex(option => option === username);
-    setVoteIndex(playerIndex);
+    let pollIndex = poll.options.findIndex((option) => option === username);
+    
+		setVoteIndex(playerIndex);
 		playerVote({ option: poll.options[pollIndex] });
-  };
-  
-  const villagerVoteHandler = (username, playerIndex) => {
-    console.log('villagervote', username);
-    let pollIndex = poll.voters.findIndex(option => option.username === username);
-    setVoteIndex(playerIndex);
+	};
+
+	const villagerVoteHandler = (username, playerIndex) => {
+    let pollIndex = poll.voters.findIndex((option) => option.username === username);
+    
+		setVoteIndex(playerIndex);
 		playerVote({ option: poll.options[pollIndex] });
 	};
 

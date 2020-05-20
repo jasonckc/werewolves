@@ -1,6 +1,8 @@
 import React, { useRef, useEffect } from "react";
 import { useStoreState } from "easy-peasy";
 import styled from "styled-components";
+
+// Components
 import { Typography, Card, Divider } from "../../atoms";
 
 const Wrapper = styled.div`
@@ -12,10 +14,6 @@ const Wrapper = styled.div`
 	height: 60vh;
 	border: 1px solid gray;
 	border-radius: 5px;
-	span:last-child {
-		position: sticky;
-		bottom: 0;
-	}
 `;
 
 const GameHistory = () => {
