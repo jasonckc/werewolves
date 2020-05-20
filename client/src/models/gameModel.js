@@ -14,8 +14,10 @@ const gameModel = {
   poll: null,
 
   nightCount: 0,
+  dayCount: 0,
 
   gameHistory: [],
+  narrator: '',
 
   // Actions
   setSocket: action((state, payload) => {
@@ -44,6 +46,12 @@ const gameModel = {
 
   updateStep: action((state, payload) => {
     state.step = payload;
+
+    if (state.step === 'night') {
+      state.nightCount++;
+    } else if (state.step === 'day') {
+      state.dayCount++;
+    }
   }),
 
   /**
@@ -63,8 +71,8 @@ const gameModel = {
   updatePlayer: action((state, payload) => {
     const { username, key, value } = payload;
 
-    state.players = state.players.filter(player => player.username === username ? player[key] = value : player);
-    state.self = {...state.self, [key]: value};
+    state.players = state.players.map((player) => player.username === username ? {...player, [key]: value} : player);
+    state.self = state.self.username === username ? {...state.self, [key]: value} : state.self;
   }), 
 
   /**
@@ -78,6 +86,10 @@ const gameModel = {
 
   updateGameHistory: action((state, payload) => {
     state.gameHistory = [...state.gameHistory, payload];
+  }),
+
+  updateNarrator: action((state, payload) => {
+    state.narrator = payload;
   }),
 
   // Thunks

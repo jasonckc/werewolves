@@ -18,7 +18,7 @@ export const Button = styled.button`
   font-weight: 400;
   color: ${({ theme }) => theme.color.white};
   background: ${({ theme }) => theme.color.secondary.main};
-  border-radius: 5px;
+  border-radius: 20px;
   border: none;
   padding: 0.6rem 1.5rem;
   margin: 1rem auto 1rem;
@@ -39,6 +39,7 @@ export const Button = styled.button`
     color: ${({ theme }) => theme.color.primary.white};
     background: ${({ theme }) => theme.color.gray};
     animation-name: none;
+    pointer-events: none;
   }
 `;
 

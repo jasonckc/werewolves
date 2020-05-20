@@ -63,6 +63,27 @@ class Poll {
     }
 
     /**
+     * Removes a voter.
+     *
+     * @param {Player} voter The voter to remove.
+     */
+    removeVoter(voter) {
+        this._voters.forEach((v, i) => {
+            if (v.id === voter.id) {
+                delete this._voters.splice(i, 1);
+                delete this._votes[voter.username];
+
+                if (this._inProgress) {
+                    var nbVotes = Object.keys(this._votes).length;
+                    this._inProgress = nbVotes < this._voters.length;
+                }
+
+                this.app.polls.save(this);
+            }
+        });
+    }
+
+    /**
      * Sets the time limit (in seconds) of the poll.
      *
      * @param {number} seconds The time limit.

@@ -1,64 +1,81 @@
 import React from "react";
 import styled, { css } from "styled-components";
+import { Typography } from "../Typography/Typography";
 
 const werewolf = require("../../../images/werewolf.png");
 const villager = require("../../../images/villager.png");
 const unknown = require("../../../images/unknown.png");
 
+const validateRole = (player, self) => {
+	if (self.role === player.role || !player.isAlive) {
+		return player.role;
+	} else {
+		return "unknown";
+	}
+};
+
 const getSrc = (player, self) => {
-	if (self.role === "villager") {
-		if (self.username === player.username) {
+	switch (validateRole(player, self)) {
+		case "villager":
 			return villager;
-		} else {
-			return unknown;
-		}
-	} else if (self.role === "werewolf") {
-		if (player.role === null) {
-			return villager;
-		} else {
+		case "werewolf":
 			return werewolf;
-		}
+		default:
+			return unknown;
 	}
 };
 
 const Wrapper = styled.div`
-	cursor: pointer;
 	margin: 1rem;
-	padding: 1rem;
+	padding: 0rem;
 	border: 1px solid gray;
-	border-radius: 5px;
-	width: 200px;
+	border-radius: 12px;
+	width: 240px;
+	height: 270px;
 	transition: all 0.25s cubic-bezier(0.02, 0.01, 0.47, 1);
-	&:hover {
-		transform: translate(0, -1rem);
-	}
+
+	${({ playerIndex, voteIndex }) => {
+		if (playerIndex === voteIndex) {
+			return css`
+				transform: translate(0, -1rem);
+			`;
+		}
+	}};
+
+	${({ disabled }) => {
+		if (disabled) {
+			return css`
+				transform: none;
+				pointer-events: none;
+			`;
+		} else {
+			return css`
+				&:hover {
+					transform: translate(0, -1rem);
+				}
+			`;
+		}
+	}};
 
 	${({ player, self }) => {
-		if (self.role === "villager") {
-			if (self.username === player.username) {
-				return css`
-					background: ${({ theme }) => theme.color.blue600};
-				`;
-			} else {
-				return css`
-					background: ${({ theme }) => theme.color.blue400};
-				`;
-			}
-		} else if (self.role === "werewolf") {
-			if (player.role === null) {
-				return css`
-					background: ${({ theme }) => theme.color.blue400};
-				`;
-			} else {
-				if (self.username === player.username) {
+		if (!player.isAlive) {
+			return css`
+				background: ${({ theme }) => theme.color.gray};
+			`;
+		} else {
+			switch (validateRole(player, self)) {
+				case "villager":
 					return css`
-						background: ${({ theme }) => theme.color.red600};
+						background: ${({ theme }) => theme.color.villager.light};
 					`;
-				} else {
+				case "werewolf":
 					return css`
-						background: ${({ theme }) => theme.color.red400};
+						background: ${({ theme }) => theme.color.werewolf.light};
 					`;
-				}
+				default:
+					return css`
+						background: ${({ theme }) => theme.color.unknown};
+					`;
 			}
 		}
 	}};
@@ -67,25 +84,33 @@ const Wrapper = styled.div`
 const Image = styled.img`
 	display: block;
 	position: relative;
-	width: 150px;
-	height: 150px;
-	margin: 1rem auto;
+	width: 140px;
+	height: 160px;
+	margin: 0 auto;
+
+	${({ role }) =>
+		role === "unknown" &&
+		css`
+			width: 120px;
+			height: 140px;
+			margin-top: 20px;
+		`};
 `;
 
-const Username = styled.div`
-	font-size: 21px;
-	font-weight: 700;
-	letter-spacing: 1;
-	text-align: center;
-	padding: 1rem 0 0;
-	color: ${({ theme }) => theme.color.white};
-`;
-
-export const Role = ({ player, self }) => {
+export const Role = ({ playerIndex, voteIndex, player, self, step }) => {
 	return (
-		<Wrapper player={player} self={self}>
-			<Image src={getSrc(player, self)}></Image>
-			<Username> {player.username} </Username>
+		<Wrapper
+			disabled={
+				step === "start" || player.username === self.username || self.role === "villager" || !player.isAlive
+			}
+			player={player}
+			self={self}
+			playerIndex={playerIndex}
+			voteIndex={voteIndex}
+		>
+			<Image src={getSrc(player, self)} role={validateRole(player, self)} />
+			<Typography variant={`username-${validateRole(player, self)}`}> {player.username} </Typography>
+			<Typography variant={`role-${validateRole(player, self)}`}>{validateRole(player, self)}</Typography>
 		</Wrapper>
 	);
 };

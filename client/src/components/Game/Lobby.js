@@ -32,6 +32,7 @@ const Lobby = () => {
     });
 
     socket.on('player-role', (username, role) => {
+      console.log('player-role')
       updatePlayer({ username, key: 'role', value: role });
       updateStep('start');
       update({

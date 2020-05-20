@@ -23,7 +23,7 @@ class Steps {
         // Determine the number of werewolves.
         var nbWerewolves =
             nbPlayers < 3 ? 2 :
-                nbPlayers < 12 ? 2 :
+                nbPlayers < 12 ? 1 :
                     nbPlayers < 18 ? 3 : 4;
 
         // Generate the list of roles.
@@ -64,7 +64,9 @@ class Steps {
      * Waits until all players acknowledge their roles by voting 'ready'.
      */
     async waitRoleAcknowlegement() {
+        console.log('Ready?')
         await this.game.startPoll(['ready']);
+        console.log('ok!')
     }
 
     /**

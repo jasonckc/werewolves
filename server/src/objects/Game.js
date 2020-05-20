@@ -46,6 +46,8 @@ class Game {
             else if (p.role === 'villager') nbAliveVillagers++;
         });
 
+        console.log('nbAliveWerewolves', nbAliveWerewolves)
+        console.log('nbAliveVillagers', nbAliveVillagers)
         // Return null if no roles have been assigned.
         if (nbAliveVillagers == 0 && nbAliveWerewolves == 0) {
             return null;
@@ -53,13 +55,13 @@ class Game {
 
         // All werewolves are dead: villagers won!
         if (nbAliveWerewolves == 0) {
-            return 'villager';
+            return 'villagers';
         }
 
         // There are either the same number or more werewolves than villagers:
         // werewolves won!
         if (nbAliveWerewolves >= nbAliveVillagers) {
-            return 'werewolf';
+            return 'werewolves';
         }
 
         // Return the winning role.
@@ -76,13 +78,13 @@ class Game {
     addPlayer(player) {
         // The maximum number of players is 18.
         if (this.players.size >= 18) {
-            player.sendMessage('join-failed');
+            player.sendMessage('join-failed', 'roomFull');
             return false;
         }
 
         // Do not allow duplicate usernames.
         if (this.players[player.username] != null) {
-            player.sendMessage('join-failed');
+            player.sendMessage('join-failed', 'duplicateUsername');
             return false;
         }
 
@@ -113,16 +115,21 @@ class Game {
      *
      * @param {string} username The username of the player to remove.
      */
-    removePlayer(username) {
+    async removePlayer(username) {
         if (this.players[username] == null) {
             return;
         }
 
-        if (username !== this.owner) {
-            this.broadcast('player-left', this.players[username]);
-            delete (this.players[username]);
-            this.app.games.save(this);
+        // If there is an ongoing poll, remove the player from the poll.
+        if (this.pollId != null) {
+            var poll = await this.app.polls.get(this.pollId);
+            if (poll != null) poll.removeVoter(this.players[username]);
         }
+
+        // Remove the player and notify the other players.
+        this.broadcast('player-left', this.players[username]);
+        delete (this.players[username]);
+        this.app.games.save(this);
     }
 
     /**
