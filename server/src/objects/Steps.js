@@ -64,9 +64,7 @@ class Steps {
      * Waits until all players acknowledge their roles by voting 'ready'.
      */
     async waitRoleAcknowlegement() {
-        console.log('Ready?')
         await this.game.startPoll(['ready']);
-        console.log('ok!')
     }
 
     /**
