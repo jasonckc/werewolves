@@ -171,7 +171,8 @@ class Game {
             else break;
         }
 
-        this.broadcast('game-ended', this.winners);
+        var playersList = Object.values(this.players);
+        this.broadcast('game-ended', this.winners, playersList);
     }
 
     /**
