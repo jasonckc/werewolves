@@ -41,12 +41,12 @@ const SnackbarWrapper = styled.div`
 	display: flex;
 	align-items: center;
 	color: ${({ theme }) => theme.color.white};
-	position: absolute;
+	position: fixed;
 	bottom: 1rem;
 	left: 1rem;
-	width: 20vw;
+	min-width: 20vw;
 	border-radius: 0.5rem;
-	padding: 1rem;
+	padding: 1rem 2rem;
 
 	animation-duration: 0.5s;
 	animation-name: ${translate};

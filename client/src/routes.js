@@ -13,10 +13,10 @@ export const Routes = () => {
   return (
     <Switch>
       <Route exact path="/" component={Home} />
-      <Route path="/create-game" component={CreateGame} />
-      <Route path="/join-game" component={JoinGame} />
-      <PrivateRoute path="/lobby" component={Lobby} />
-      <PrivateRoute path="/game" component={Game} />
+      <Route path="/create-game/" component={CreateGame} />
+      <Route path="/join-game/:matchId?/" component={JoinGame} />
+      <PrivateRoute path="/lobby/" component={Lobby} />
+      <PrivateRoute path="/game/" component={Game} />
     </Switch>
   )
 }

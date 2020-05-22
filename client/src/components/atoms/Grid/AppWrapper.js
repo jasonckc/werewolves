@@ -2,13 +2,25 @@ import React from 'react';
 import { useStoreState } from 'easy-peasy';
 import styled, { css, keyframes } from 'styled-components';
 
-const pulse = keyframes`
-  from {
+const pulseNight = keyframes`
+  0% {
     background: #fff;
   }
 
-  to {
-    background: #424242;
+  100% {
+    background: #000 ;
+
+  }
+`;
+
+const pulseDay = keyframes`
+  0% {
+    background: #000;
+  }
+
+  100% {
+    background: #fff ;
+
   }
 `;
 
@@ -17,8 +29,16 @@ const Wrapper = styled.div`
 		switch(step) {
       case 'night': {
         return css`
-					animation-duration: 2s;
-          animation-name: ${pulse};
+					animation-duration: 4s;
+          animation-name: ${pulseNight};
+          animation-fill-mode: forwards;
+				`;
+      }
+      case 'end':
+      case 'day': {
+        return css`
+					animation-duration: 4s;
+          animation-name: ${pulseDay};
           animation-fill-mode: forwards;
 				`;
       }
@@ -28,7 +48,7 @@ const Wrapper = styled.div`
 				`;
       }
     }
-	}};
+  }};
 `;
 
 export const AppWrapper = ({ children}) => {

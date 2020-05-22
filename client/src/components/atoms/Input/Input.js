@@ -18,6 +18,7 @@ export const useInput = initialValue => {
 };
 
 export const Input = styled.input`
+  width: 300px;
   padding: 1rem;
   font-weight: 600;
   color: ${({ theme }) => theme.color.secondary.light};

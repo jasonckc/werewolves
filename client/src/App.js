@@ -20,9 +20,7 @@ function App() {
 	// Render the page.
 	return (
 		<div className="App">
-			<Navbar />
 			<Routes />
-			<Footer />
 			<Snackbar />
 		</div>
 	);

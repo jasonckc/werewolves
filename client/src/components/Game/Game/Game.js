@@ -6,20 +6,22 @@ import { Container, Grid } from "../../atoms";
 import Roles from "./Roles";
 import Narrator from "./Narrator";
 import GameHistory from "./GameHistory";
+import { AppWrapper } from "../../atoms/Grid/AppWrapper";
 
 const Game = () => {
 	// States
 	const { socket, step, self, nightCount, dayCount } = useStoreState((state) => state.game);
 
 	// Actions
-	const { setPoll, updatePlayer, updateStep, updateGameHistory, updateNarrator } = useStoreActions(
-		(actions) => actions.game
-	);
+	const { 
+		setPoll, onPollVote, onPlayerDied, onPollEnded, onGameEnded, updateNarrator, updatePlayer 
+	} = useStoreActions((actions) => actions.game);
 
 	// Listen to player-joined and re-render
 	useEffect(() => {
-		updateNarrator(`Welcome to the game of Werewolves! You've been assigned as a ${self && self.role}. 
-    Ready up and good luck!`);
+		window.scrollTo(0, 0);
+
+		updateNarrator('waiting');
 	}, []);
 
 	useEffect(
@@ -29,47 +31,19 @@ const Game = () => {
 			});
 
 			socket.on("poll-voted", (username, option) => {
-				if (option === "ready") {
-					updatePlayer({ username, key: option, value: true });
-					updateGameHistory({ timestamp: Date.now(), message: `${username} is ${option}` });
-				} else {
-					updateGameHistory({ timestamp: Date.now(), message: `${username} wishes to vote for ${option}` });
-				}
+				onPollVote({ username, option });
 			});
 
-			socket.on("poll-ended", (res) => {
-				if (step === "start") {
-					updateStep("night");
-					updateNarrator(`The night is falling. Werewolves, choose your prey.`);
-					updateGameHistory({ timestamp: Date.now(), message: `Night #${nightCount + 1}` });
-				}
+			socket.on("poll-ended", () => {
+				onPollEnded();
 			});
 
 			socket.on("player-died", (username, role) => {
-				if (step === "night") {
-					updateStep("day");
-					updateGameHistory({ timestamp: Date.now(), message: `Day #${dayCount}` });
-					updateNarrator(
-						`It's a new day! But the ${role} ${username} has died during the night.. Who's the culprit?`
-					);
-				} else if (step === "day") {
-					updateStep("night");
-					updateGameHistory({ timestamp: Date.now(), message: `Night #${nightCount + 1}` });
-					updateNarrator(`The night is falling again, after the council executed ${role} ${username}.`);
-				}
-
-				updatePlayer({ username, key: "isAlive", value: false });
-				updatePlayer({ username, key: "role", value: role });
-				updateGameHistory({
-					timestamp: Date.now(),
-					message: `${username} [${role.toUpperCase()}] has been killed.`
-				});
+				onPlayerDied({ username, role });
 			});
 
 			socket.on("game-ended", (winner) => {
-				updateStep("end");
-				updateNarrator(`The ${winner} have won the game! Good game!`);
-				updateGameHistory({ timestamp: Date.now(), message: `The ${winner} have won the game.` });
+				onGameEnded({ winner });
 			});
 
 			return () => {
@@ -84,17 +58,19 @@ const Game = () => {
 	);
 
 	return (
-		<Container>
-			<Grid container direction="row" justifyContent="center" alignItems="flex-start">
-				<Grid item sm={9}>
-					<Narrator />
-					<Roles />
+		<AppWrapper step={step}>
+			<Container>
+				<Grid container direction="row" justifyContent="center" alignContent="center" alignItems="center">
+					<Grid item sm={9} xs={12} align={`${step === "night" && self.role === "villager" ? "center" : "flex-start"}`}>
+						<Narrator />
+						{ (step !== "night" || self.role !== "villager") && <Roles />}
+					</Grid>
+					<Grid item sm={3} xs={12} align="flex-start">
+						<GameHistory />
+					</Grid>
 				</Grid>
-				<Grid item xs={3}>
-					<GameHistory />
-				</Grid>
-			</Grid>
-		</Container>
+			</Container>
+		</AppWrapper>
 	);
 };
 

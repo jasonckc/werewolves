@@ -1,8 +1,12 @@
 import styled from "styled-components";
 
 export const Container = styled.div`
+	display: flex;
 	width: 100%;
-	margin: 0  auto;
+	min-height: 100vh;
+	margin: 0 auto;
+	padding-top: 4rem;
+	padding-bottom: 4rem;
   box-sizing: border-box;
 
 	@media (min-width: 576px) {

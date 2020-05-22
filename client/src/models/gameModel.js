@@ -12,11 +12,15 @@ const gameModel = {
 	step: "waiting", // Sequence: waiting, ready, night, day
 	poll: null,
 
+	lastKilled: null, // Last player killed
+
 	nightCount: 0,
 	dayCount: 0,
 
 	gameHistory: [],
-	narrator: "",
+	narrator: null,
+
+	winner: null,
 
 	// Actions
 	setSocket: action((state, payload) => {
@@ -85,12 +89,20 @@ const gameModel = {
 		state.poll = payload;
 	}),
 
+	updateLastKilled: action((state, payload) => {
+		state.lastKilled = payload
+	}),
+
 	updateGameHistory: action((state, payload) => {
-		state.gameHistory = [ ...state.gameHistory, payload ];
+		state.gameHistory = [ ...state.gameHistory, { timestamp: Date.now(), message: payload } ];
 	}),
 
 	updateNarrator: action((state, payload) => {
 		state.narrator = payload;
+	}),
+
+	setWinner: action((state, payload) => {
+		state.winner = payload;
 	}),
 
 	// Thunks
@@ -107,7 +119,6 @@ const gameModel = {
 	joinGame: thunk((actions, payload, { getState }) => {
 		const { gameId, username } = payload;
 
-		console.log("payload", payload);
 		return new Promise((resolve, reject) => {
 			getState().socket.emit("join-game", gameId, username);
 
@@ -125,10 +136,67 @@ const gameModel = {
 
 	playerVote: thunk((actions, payload, { getState }) => {
 		const { option } = payload;
-		console.log("option", option);
+
 		return new Promise((resolve, reject) => {
 			getState().socket.emit("poll-vote", option);
 			resolve(true);
+		});
+	}),
+
+	onPollVote: thunk((actions, payload, { getState }) => {
+		const { username, option } = payload;
+
+		if (option === "ready") {
+			actions.updatePlayer({ username, key: option, value: true });
+			actions.updateGameHistory(`${username} is ${option}`);
+		} else {
+			actions.updateGameHistory(`${username} wishes to vote for ${option}`);
+		}
+	}),
+
+	onPollEnded: thunk((actions, payload, { getState }) => {
+		if (getState().step === "start") {
+			actions.updateStep("night");
+			actions.updateNarrator("start");
+			actions.updateGameHistory(`Night #${getState().nightCount}`);
+		}
+	}),
+
+	onPlayerDied: thunk((actions, payload, { getState }) => {
+		const { username, role } = payload;
+
+		actions.updateLastKilled({ username, role });
+		actions.updatePlayer({ username, key: "isAlive", value: false });
+		actions.updatePlayer({ username, key: "role", value: role });
+
+		if (getState().step === "night") {
+			actions.updateStep("day");
+			actions.updateGameHistory(`Day #${getState().dayCount}`);
+			actions.updateNarrator("day");
+
+		} else if (getState().step === "day") {
+			actions.updateStep("night");
+			actions.updateGameHistory(`Night #${getState().nightCount}`);
+			actions.updateNarrator("night");
+		}
+
+		actions.updateGameHistory(`${username} [${role.toUpperCase()}] has been killed.`);
+	}),
+
+	onGameEnded: thunk((actions, payload, { getState }) => {
+		const { winner } = payload;
+
+		return new Promise((resolve, reject) => {
+
+			// if (winner === "werewolves") {
+			// 	getState().players.map()
+			// }
+			actions.updateStep("end");
+			actions.updateNarrator("end");
+			actions.setWinner(winner);
+			actions.updateGameHistory(`The ${winner} have won the game.`);
+
+			resolve(winner);
 		});
 	}),
 

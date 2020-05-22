@@ -21,7 +21,7 @@ export const Button = styled.button`
   border-radius: 20px;
   border: none;
   padding: 0.6rem 1.5rem;
-  margin: 1rem auto 1rem;
+  margin: 0.5rem auto;
   letter-spacing: 1px;
   float: ${({ float }) => float};
   width: ${({ width }) => width};
@@ -44,6 +44,7 @@ export const Button = styled.button`
 `;
 
 export const ButtonLink = styled(Link)`
+  display: block;
   cursor: pointer;
   font-size: 16px;
   font-weight: 400;
@@ -55,7 +56,7 @@ export const ButtonLink = styled(Link)`
   margin: 1rem auto 1rem;
   float: ${({ float }) => float};
   letter-spacing: 1px;
-  min-width: 200px;
+  width: 300px;
   text-align: center;
   text-decoration: none;
 

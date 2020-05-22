@@ -11,6 +11,7 @@ export const Grid = styled.div`
   ${({ container, direction, justifyContent, alignItems, alignContent }) => container &&
     css`
       display: flex;
+      position: relative;
       flex-direction: ${direction};
       flex-wrap: ${direction = 'row' && 'wrap'};
       flex-basis: ${direction = 'column' && '100%'};
@@ -25,6 +26,9 @@ export const Grid = styled.div`
 
   ${({ item, xs, sm, md, lg, align }) => item &&
     css`
+    position: relative;
+      width: auto;
+
       @media (min-width: 420px) {
         flex-basis: calc(${xs} / 12 * 100%);
       };

@@ -10,27 +10,45 @@ export const Typography = styled.span`
     switch(variant) {
       case 'game-title': {
         return css`
-          font-size: 22px;
-          font-weight: 600;
+          font-size: 56px;
+          font-weight: 700;
+          letter-spacing: 3px;
           color: ${({ theme }) => theme.color.primary.dark};
         `;
       }
       case 'title': {
         return css`
-          font-size: 30px;
+          font-size: 42px;
+          font-weight: 600;
+          color: ${({ theme }) => theme.color.primary.dark};
+        `;
+      }
+      case 'narrator-main': {
+        return css`
+          font-size: 42px;
+          font-weight: 600;
+          color: ${({ theme }) => theme.color.black};
+        `;
+      }
+      case 'narrator-sub': {
+        return css`
+          font-size: 32px;
           font-weight: 500;
-          color: ${({ theme }) => theme.color.primary.main};
+          color: ${({ theme }) => theme.color.black};
         `;
       }
       case 'subtitle1': {
         return css`
-          font-size: 24px;
+          font-size: 32px;
+          font-weight: 500;
+          color: ${({ theme }) => theme.color.primary.main};
         `;
       }
       case 'subtitle2': {
         return css`
-          font-size: 22px;
-          color: ${({ theme }) => theme.color.primary.main};
+          font-size: 21px;
+          font-weight: 500;
+          color: ${({ theme }) => theme.color.primary.dark};
         `;
       }
       case 'body1': {
@@ -41,8 +59,22 @@ export const Typography = styled.span`
       case 'label': {
         return css`
           font-size: 16px;
-          font-weight: 600;
+          font-weight: 500;
+          color: ${({ theme }) => theme.color.primary.main};
+        `;
+      }
+      case 'link': {
+        return css`
+          font-size: 18px;
           color: ${({ theme }) => theme.color.primary.light};
+          cursor: pointer;        
+        `;
+      }
+      case 'caption': {
+        return css`
+          font-size: 14px;
+          font-weight: 300;
+          color: ${({ theme }) => theme.color.primary.main};
         `;
       }
       case 'username-werewolf': {
@@ -74,7 +106,7 @@ export const Typography = styled.span`
           letter-spacing: 1;
           text-align: center;
           
-          padding: 0.4rem 0;
+          padding: 0.3rem 0;
           margin: 0.5rem 4rem;
           background: ${({ theme }) => theme.color.white};
           color: ${({ theme }) => theme.color.werewolf.light};
@@ -88,7 +120,7 @@ export const Typography = styled.span`
           letter-spacing: 1;
           text-align: center;
           
-          padding: 0.4rem 0;
+          padding: 0.3rem 0;
           margin: 0.5rem 4rem;
           background: ${({ theme }) => theme.color.werewolf.light};
           color: ${({ theme }) => theme.color.white};
@@ -103,7 +135,7 @@ export const Typography = styled.span`
           letter-spacing: 1;
           text-align: center;
           
-          padding: 0.4rem 0;
+          padding: 0.3rem 0;
           margin: 0.5rem 4rem;
           background: ${({ theme }) => theme.color.werewolf.light};
           color: ${({ theme }) => theme.color.white};

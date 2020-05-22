@@ -6,14 +6,18 @@ import styled from "styled-components";
 import { Typography, Card, Divider } from "../../atoms";
 
 const Wrapper = styled.div`
-	margin: 2rem 0;
 	overflow-y: scroll;
 	padding: 1rem;
-	margin: 1rem auto;
-	width: 100%;
-	height: 60vh;
+	margin: 3rem auto 1rem;
+	width: 320px;
+	height: 70vh;
 	border: 1px solid gray;
-	border-radius: 5px;
+	border-radius: 12px;
+	background: ${({ theme }) => theme.color.white};
+	::-webkit-scrollbar {
+		display: none;
+	};
+	-ms-overflow-style: none;
 `;
 
 const GameHistory = () => {
@@ -40,12 +44,9 @@ const GameHistory = () => {
 					</Typography>
 				))
 			) : (
-				<Typography variant="body1" align="center">
-					{" "}
-					The calm before the storm{" "}
-				</Typography>
+				""
 			)}
-			<AlwaysScrollToBottom />
+			{/* <AlwaysScrollToBottom /> */}
 		</Wrapper>
 	);
 };

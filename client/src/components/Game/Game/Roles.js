@@ -2,17 +2,15 @@ import React, { useState } from "react";
 import { useStoreState, useStoreActions } from "easy-peasy";
 
 // Components
-import { Grid, Role, Button } from "../../atoms";
+import { Grid, Role, Button, Image } from "../../atoms";
+
+const tick = require('../../../images/tick.svg');
 
 const Roles = () => {
 	const { step, self, players, poll } = useStoreState((state) => state.game);
 	const { playerVote } = useStoreActions((actions) => actions.game);
 
 	const [ voteIndex, setVoteIndex ] = useState(-1);
-
-	const readyOptionHandler = () => {
-		playerVote({ option: poll.options[0] });
-	};
 
 	const werewolfVoteHandler = (username, playerIndex) => {
     let pollIndex = poll.options.findIndex((option) => option === username);
@@ -30,24 +28,15 @@ const Roles = () => {
 
 	const renderVotes = (player, self, playerIndex) => {
 		switch (step) {
-			case "start":
-				return (
-					<Button
-						width="90%"
-						onClick={readyOptionHandler}
-						disabled={player.username !== self.username || player.ready}
-					>
-						{player && player.ready ? "Ready" : "Unready"}
-					</Button>
-				);
 			case "night":
 				return (
 					<Button
 						width="90%"
 						onClick={werewolfVoteHandler.bind(this, player.username, playerIndex)}
-						disabled={!player.isAlive || self.role === "villager" || self.username === player.username}
+						disabled={!self.isAlive || !player.isAlive || self.username === player.username}
 					>
-						{self.role === "villager" ? "Waiting" : "Vote"}
+						
+					Vote
 					</Button>
 				);
 
@@ -58,7 +47,8 @@ const Roles = () => {
 						onClick={villagerVoteHandler.bind(this, player.username, playerIndex)}
 						disabled={!self.isAlive || !player.isAlive || self.username === player.username}
 					>
-						Vote
+
+					Vote
 					</Button>
 				);
 		}
