@@ -16,8 +16,8 @@ export const Button = styled.button`
   cursor: pointer;
   font-size: 16px;
   font-weight: 400;
-  color: ${({ theme }) => theme.color.white};
-  background: ${({ theme }) => theme.color.secondary.main};
+  color: ${({ theme }) => theme.color.secondary.light};
+  background: ${({ theme }) => theme.color.primary.dark};
   border-radius: 20px;
   border: none;
   padding: 0.6rem 1.5rem;
@@ -28,7 +28,7 @@ export const Button = styled.button`
 ;
 
   &:hover {
-    background: ${({ theme }) => theme.color.secondary.dark};
+    background: ${({ theme }) => theme.color.primary.main};
     animation-duration: 0.5s;
     animation-name: ${translate};
     animation-iteration-count: infinite;
@@ -36,7 +36,7 @@ export const Button = styled.button`
   };
 
   &:disabled {
-    color: ${({ theme }) => theme.color.primary.white};
+    color: ${({ theme }) => theme.color.white};
     background: ${({ theme }) => theme.color.gray};
     animation-name: none;
     pointer-events: none;

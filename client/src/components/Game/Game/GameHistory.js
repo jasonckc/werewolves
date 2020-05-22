@@ -3,7 +3,7 @@ import { useStoreState } from "easy-peasy";
 import styled from "styled-components";
 
 // Components
-import { Typography, Card, Divider } from "../../atoms";
+import { Typography, Divider } from "../../atoms";
 
 const Wrapper = styled.div`
 	overflow-y: scroll;

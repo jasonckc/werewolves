@@ -90,7 +90,7 @@ const gameModel = {
 	}),
 
 	updateLastKilled: action((state, payload) => {
-		state.lastKilled = payload
+		state.lastKilled = payload;
 	}),
 
 	updateGameHistory: action((state, payload) => {
@@ -173,7 +173,6 @@ const gameModel = {
 			actions.updateStep("day");
 			actions.updateGameHistory(`Day #${getState().dayCount}`);
 			actions.updateNarrator("day");
-
 		} else if (getState().step === "day") {
 			actions.updateStep("night");
 			actions.updateGameHistory(`Night #${getState().nightCount}`);
@@ -184,13 +183,20 @@ const gameModel = {
 	}),
 
 	onGameEnded: thunk((actions, payload, { getState }) => {
-		const { winner } = payload;
+		const { winner, players } = payload;
 
 		return new Promise((resolve, reject) => {
+			players.map(
+				(player) =>
+					player.role === "werewolf"
+						? getState().players.find(
+								(player1) =>
+									player.username === player1.username &&
+									actions.updatePlayer({ username: player1.username, key: "role", value: player.role })
+							)
+						: player
+			);
 
-			// if (winner === "werewolves") {
-			// 	getState().players.map()
-			// }
 			actions.updateStep("end");
 			actions.updateNarrator("end");
 			actions.setWinner(winner);
@@ -212,7 +218,6 @@ const gameModel = {
 			});
 
 			await getState().socket.on("join-success", (game) => {
-				console.log("game", game);
 				actions.setGameId(game.id);
 				actions.setOwner(game.owner);
 				actions.setPlayers(game.players);
@@ -229,9 +234,30 @@ const gameModel = {
 	onJoinGame: thunkOn(
 		(actions) => actions.joinGame,
 		async (actions, target, { getState, getStoreActions }) => {
-			await getState().socket.on("join-failed", () => {
+			await getState().socket.on("join-failed", (test) => {
+				console.log('test', test)
+				let error = "";
+
+				switch(test) {
+					case "invalidUsername":
+						error = "Invalid username";
+						break;
+					case "duplicateUsername":
+						error = "Username already exists";
+						break;
+					case "gameDoesNotExist":
+						error = "Invalid game id";
+						break;
+					case "roomFull":
+						error = "Sorry the room capacity has been reached";
+						break;
+					case "internalError":
+						error = "An error has occured";
+						break;
+				}
+
 				getStoreActions().notifier.update({
-					message: "An error has occured",
+					message: error,
 					variant: "error"
 				});
 			});

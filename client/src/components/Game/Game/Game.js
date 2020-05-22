@@ -42,8 +42,9 @@ const Game = () => {
 				onPlayerDied({ username, role });
 			});
 
-			socket.on("game-ended", (winner) => {
-				onGameEnded({ winner });
+			socket.on("game-ended", (winner, players) => {
+				console.log('players', players)
+				onGameEnded({ winner, players });
 			});
 
 			return () => {

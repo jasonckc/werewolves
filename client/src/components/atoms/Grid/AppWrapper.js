@@ -9,7 +9,6 @@ const pulseNight = keyframes`
 
   100% {
     background: #000 ;
-
   }
 `;
 
@@ -17,10 +16,9 @@ const pulseDay = keyframes`
   0% {
     background: #000;
   }
-
+  
   100% {
     background: #fff ;
-
   }
 `;
 
