@@ -13,15 +13,21 @@ const Game = () => {
 	const { socket, step, self, nightCount, dayCount } = useStoreState((state) => state.game);
 
 	// Actions
-	const { 
-		setPoll, onPollVote, onPlayerDied, onPollEnded, onGameEnded, updateNarrator, updatePlayer 
+	const {
+		setPoll,
+		onPollVote,
+		onPlayerDied,
+		onPollEnded,
+		onGameEnded,
+		updateNarrator,
+		updatePlayer
 	} = useStoreActions((actions) => actions.game);
 
 	// Listen to player-joined and re-render
 	useEffect(() => {
 		window.scrollTo(0, 0);
 
-		updateNarrator('waiting');
+		updateNarrator("waiting");
 	}, []);
 
 	useEffect(
@@ -43,8 +49,7 @@ const Game = () => {
 			});
 
 			socket.on("game-ended", (winner, players) => {
-				console.log('players', players)
-				onGameEnded({ winner, players });
+ 				onGameEnded({ winner, players });
 			});
 
 			return () => {
@@ -62,9 +67,14 @@ const Game = () => {
 		<AppWrapper step={step}>
 			<Container>
 				<Grid container direction="row" justifyContent="center" alignContent="center" alignItems="center">
-					<Grid item sm={9} xs={12} align={`${step === "night" && self.role === "villager" ? "center" : "flex-start"}`}>
+					<Grid
+						item
+						sm={9}
+						xs={12}
+						align={`${step === "night" && self.role === "villager" ? "center" : "flex-start"}`}
+					>
 						<Narrator />
-						{ (step !== "night" || self.role !== "villager") && <Roles />}
+						{(step !== "night" || self.role !== "villager") && <Roles />}
 					</Grid>
 					<Grid item sm={3} xs={12} align="flex-start">
 						<GameHistory />

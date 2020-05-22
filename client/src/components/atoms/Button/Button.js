@@ -17,18 +17,21 @@ export const Button = styled.button`
   font-size: 16px;
   font-weight: 400;
   color: ${({ theme }) => theme.color.secondary.light};
-  background: ${({ theme }) => theme.color.primary.dark};
-  border-radius: 20px;
+  background: ${({ theme }) => theme.color.primary.main};
+  border-radius: 12px;
   border: none;
   padding: 0.6rem 1.5rem;
   margin: 0.5rem auto;
   letter-spacing: 1px;
   float: ${({ float }) => float};
   width: ${({ width }) => width};
-;
+  
+  &:focus {
+    outline: none;
+  }
 
   &:hover {
-    background: ${({ theme }) => theme.color.primary.main};
+    background: ${({ theme }) => theme.color.primary.dark};
     animation-duration: 0.5s;
     animation-name: ${translate};
     animation-iteration-count: infinite;
@@ -52,6 +55,7 @@ export const ButtonLink = styled(Link)`
   background: ${({ theme }) => theme.color.primary.main};
   border-radius: 5px;
   border: none;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
   padding: 0.6rem 1.5rem;
   margin: 1rem auto 1rem;
   float: ${({ float }) => float};

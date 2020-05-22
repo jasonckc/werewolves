@@ -138,7 +138,7 @@ export const Role = ({ playerIndex, voteIndex, player, self, step }) => {
 	return (
 		<Wrapper
 			disabled={
-				step === "start" || player.username === self.username || !player.isAlive
+				step === "start" || step === "end" || player.username === self.username || !player.isAlive
 			}
 			player={player}
 			self={self}

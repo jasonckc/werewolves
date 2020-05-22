@@ -4,7 +4,7 @@ import styled, { css, keyframes } from 'styled-components';
 
 const pulseNight = keyframes`
   0% {
-    background: #fff;
+    background: inherit;
   }
 
   100% {
@@ -18,11 +18,12 @@ const pulseDay = keyframes`
   }
   
   100% {
-    background: #fff ;
+    background: #f5f5dc  ;
   }
 `;
 
 const Wrapper = styled.div`
+
   ${({ step }) => {
 		switch(step) {
       case 'night': {
@@ -42,7 +43,7 @@ const Wrapper = styled.div`
       }
       default: {
         return css`
-					background: ${({ theme }) => theme.color.white};
+					background: inherit;
 				`;
       }
     }
