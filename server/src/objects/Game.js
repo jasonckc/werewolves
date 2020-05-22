@@ -46,6 +46,8 @@ class Game {
             else if (p.role === 'villager') nbAliveVillagers++;
         });
 
+        console.log('nbAliveWerewolves', nbAliveWerewolves)
+        console.log('nbAliveVillagers', nbAliveVillagers)
         // Return null if no roles have been assigned.
         if (nbAliveVillagers == 0 && nbAliveWerewolves == 0) {
             return null;
@@ -53,13 +55,13 @@ class Game {
 
         // All werewolves are dead: villagers won!
         if (nbAliveWerewolves == 0) {
-            return 'villager';
+            return 'villagers';
         }
 
         // There are either the same number or more werewolves than villagers:
         // werewolves won!
         if (nbAliveWerewolves >= nbAliveVillagers) {
-            return 'werewolf';
+            return 'werewolves';
         }
 
         // Return the winning role.
@@ -153,9 +155,9 @@ class Game {
      */
     async start() {
         // The minimum number of players is 6
-        // if (Object.keys(this.players).length < 6) {
-        //     return;
-        // }
+        if (Object.keys(this.players).length < 3) {
+            return;
+        }
 
         this.broadcast('game-started');
 

@@ -1,25 +1,5 @@
 import styled, { css } from "styled-components";
 
-const _xs = '640px';
-const _sm = '768px';
-const _md = '1024px';
-const _lg = '1200px';
-
-// export const Grid = styled.div`
-//   ${({ container }) => container && 
-//     css`
-//       display: grid;
-//       grid-template-columns: repeat(12, [col-start] 1fr);
-//     `
-//   };
-
-//   ${({ item, size }) => item && 
-//     css`
-//       grid-column: col-start / span ${size};
-//     `
-//   };
-// `;
-
 /**
  *  flex-direction: row | row-reverse | column | column-reverse;
  *  justify-content: flex-start | flex-end | center | space-between | space-around | space-evenly | start | end | left | right ... + safe | unsafe;
@@ -31,12 +11,13 @@ export const Grid = styled.div`
   ${({ container, direction, justifyContent, alignItems, alignContent }) => container &&
     css`
       display: flex;
+      position: relative;
       flex-direction: ${direction};
       flex-wrap: ${direction = 'row' && 'wrap'};
       flex-basis: ${direction = 'column' && '100%'};
       justify-content: ${justifyContent || 'center'};
       align-items: ${alignItems || 'center'};
-      align-content: ${alignContent || 'center'};
+      align-content: ${alignContent || 'flex-start'};
       
       margin: 0 auto;
       padding: 0 1rem;
@@ -45,6 +26,9 @@ export const Grid = styled.div`
 
   ${({ item, xs, sm, md, lg, align }) => item &&
     css`
+    position: relative;
+      width: auto;
+
       @media (min-width: 420px) {
         flex-basis: calc(${xs} / 12 * 100%);
       };

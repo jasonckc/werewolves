@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 
 export const Fieldset = styled.fieldset`
-  position: relative;
   padding: 0;
   margin: 0;
   border: 0;

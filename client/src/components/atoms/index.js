@@ -7,3 +7,6 @@ export * from './Typography/Typography';
 export * from './Snackbar/Snackbar';
 
 export * from './Card/Card';
+export * from './Divider/Divider';
+export * from './Card/Role';
+export * from './Image/Image';

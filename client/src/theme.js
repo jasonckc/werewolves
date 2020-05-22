@@ -12,6 +12,19 @@ const theme = {
     },
     white: "#fff",
     black: "#000",
+    gray: "#ccc",
+
+    villager: {
+      light: "#e9ddaf",
+      main: "#c5b884"
+    },
+
+    werewolf: {
+      light: "#4d4d4d",
+      main: "#333030"
+    },
+
+    unknown: "#f2f2f2",
 
     success: "#2e7d32",
     warning: "#f9a825",

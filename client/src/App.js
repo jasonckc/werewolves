@@ -1,45 +1,29 @@
-import React from 'react';
+import React from "react";
 import socketIOClient from "socket.io-client";
-import './App.css';
-import { useStoreActions, useStoreState } from "easy-peasy";
+import "./App.css";
+import { useStoreActions } from "easy-peasy";
 
 // Components
-import Navbar from './components/Navigation/Navbar';
-import Footer from './components/Navigation/Footer';
-import { Routes } from './routes';
-import { Snackbar } from './components/atoms';
-
-// Actions
+import Navbar from "./components/Navigation/Navbar";
+import Footer from "./components/Navigation/Footer";
+import { Routes } from "./routes";
+import { Snackbar } from "./components/atoms";
+import { AppWrapper } from "./components/atoms/Grid/AppWrapper";
 
 function App() {
-  const { setSocket } = useStoreActions((actions) => actions.game);
+	const { setSocket } = useStoreActions((actions) => actions.game);
 
-  // Connect to the socket server.
-  const socket = socketIOClient("http://127.0.0.1:8000");
-  setSocket(socket);
-  socket.on('player-joined', (player) => {
-    console.log('player joined!');
-    console.log(player);
-  });
+	// Connect to the socket server.
+	const gameSocket = socketIOClient("http://127.0.0.1:8000");
+	setSocket(gameSocket);
 
-  socket.on('player-left', (player) => {
-    console.log('player left...');
-    console.log(player);
-  })
-
-  // Message example
-  // socket.emit('create-game', 'John');
-  socket.emit('join-game', 'sKOTiWhI0', 'John');
-
-  // Render the page.
-  return (
-    <div className="App">
-      <Navbar/>
-      <Routes/>
-      <Footer/>
-      <Snackbar/>
-    </div>
-  );
+	// Render the page.
+	return (
+		<div className="App">
+			<Routes />
+			<Snackbar />
+		</div>
+	);
 }
 
 export default App;
