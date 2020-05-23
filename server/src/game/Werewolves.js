@@ -2,6 +2,7 @@ import GameManager from "./managers/GameManager";
 import PlayerManager from "./managers/PlayerManager";
 import PollManager from "./managers/PollManager";
 import AsyncLock from "async-lock";
+import { Tedis } from "tedis";
 
 /**
  * The main class of the Werewolves game.
