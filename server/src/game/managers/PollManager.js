@@ -10,10 +10,10 @@ class PollManager {
     /**
      * Initializes the poll manager.
      *
-     * @param {Tedis}      redis The connection to redis.
      * @param {Werewolves} app   The application.
+     * @param {Tedis}      redis The connection to redis.
      */
-    constructor(redis, app) {
+    constructor(app, redis) {
         this._redis = redis;
         this.app = app;
         this._lastId = null;

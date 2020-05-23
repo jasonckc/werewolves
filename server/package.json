@@ -8,13 +8,17 @@
     ]
   },
   "scripts": {
-    "start": "nodemon --exec babel-node ./app.js"
+    "clean": "rimraf build",
+    "build-babel": "babel -d ./build ./src -s",
+    "build": "npm run clean && npm run build-babel",
+    "start": "npm run build && nodemon ./build/app.js"
   },
   "dependencies": {
     "async-lock": "^1.2.4",
     "debug": "~2.6.9",
     "express": "^4.17.1",
     "nodemon": "^2.0.4",
+    "rimraf": "^3.0.2",
     "shortid": "^2.2.15",
     "socket.io": "^2.3.0",
     "tedis": "^0.1.12"
@@ -24,5 +28,11 @@
     "@babel/core": "^7.9.6",
     "@babel/node": "^7.8.7",
     "@babel/preset-env": "^7.9.6"
+  },
+  "nodemonConfig": {
+    "exec": "npm run build && node ./build/app.js",
+    "watch": [
+      "src/*"
+    ]
   }
 }

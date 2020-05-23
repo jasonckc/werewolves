@@ -12,8 +12,8 @@ class GameManager {
     /**
      * Initializes the game manager.
      *
-     * @param {Tedis}      redis The connection to redis.
      * @param {Werewolves} app   The application.
+     * @param {Tedis}      redis The connection to redis.
      */
     constructor(app, redis) {
         this._redis = redis;
@@ -41,7 +41,7 @@ class GameManager {
      */
     async delete(game) {
         await this._redis
-            .del('Game_'.game.id)
+            .del('Game_' + game.id)
             .catch((err) => { console.error(err); })
     }
 

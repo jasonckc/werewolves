@@ -7,9 +7,10 @@
     "client": "cd client && npm start",
     "server": "cd server && npm start",
     "start": "concurrently \"npm run server\" \"npm run client\"",
-    "heroku-postbuild": "cd client && npm install && npm run build",
     "concurrently": "concurrently --kill-others",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "heroku-postbuild": "npm run install-client && npm run install-server",
+    "install-client": "cd client && npm install && npm run build",
+    "install-server": "cd server && npm install && npm run build"
   },
   "repository": {
     "type": "git",
