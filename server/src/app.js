@@ -17,6 +17,7 @@ import path from "path";
 var redis = null;
 if (process.env.REDISTOGO_URL) {
     var rtg = url.parse(process.env.REDISTOGO_URL);
+    console.log(rtg);
     redis = new Tedis({
         host: rtg.hostname,
         port: rtg.port,
