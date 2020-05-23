@@ -18,7 +18,7 @@ if (process.env.REDISTOGO_URL) {
     });
 }
 
-var io = socket.listen('8000');
+var io = socket.listen('8000', { origins: '*:*' });
 var ww = new Werewolves(redis);
 
 io.on("connection", (socket) => {
