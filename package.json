@@ -4,9 +4,10 @@
   "description": "Werewolves game",
   "main": "index.js",
   "scripts": {
+    "start": "cd server && npm start",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
     "client": "cd client && npm start",
     "server": "cd server && npm start",
-    "start": "concurrently \"npm run server\" \"npm run client\"",
     "concurrently": "concurrently --kill-others",
     "heroku-postbuild": "npm run install-client && npm run install-server",
     "install-client": "cd client && npm install && npm run build",

@@ -7,6 +7,7 @@ import * as url from "url";
 import express from "express";
 import http from 'http';
 import Werewolves from "./game/Werewolves";
+import path from "path";
 
 /**
  * ----------------------------------------------------------------------------
@@ -38,9 +39,11 @@ var srv = http.createServer(app);
 var io = socket(srv, { origins: '*:*' });
 var ww = new Werewolves(redis);
 
-// Test route, to check that the server is up.
-app.get('/', (req, res) => {
-    res.send('Socket server')
+// Serve the react app.
+app.use(express.static(path.join(__dirname, '/../../client/build')));
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname + '/../../client/build/index.html'));
 });
 
 // Handle socket messages.
@@ -71,6 +74,7 @@ io.on("connection", (socket) => {
  * Start the socket server
  * ----------------------------------------------------------------------------
  */
-srv.listen(8000, () => {
-    console.log('listening on *:8000');
+var port = process.env.PORT || 8080;
+srv.listen(port, () => {
+    console.log('listening on *:' + port);
 });
