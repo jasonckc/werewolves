@@ -11,7 +11,7 @@ function App() {
 	const { setSocket } = useStoreActions((actions) => actions.game);
 
 	// Connect to the socket server.
-	const gameSocket = io.connect('http://localhost:8080');
+	const gameSocket = io.connect();
 	setSocket(gameSocket);
 
 	// Render the page.
