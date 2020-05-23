@@ -1,9 +1,16 @@
 import Werewolves from './src/Werewolves';
 import socket from "socket.io";
 import { Tedis } from "tedis";
-import * as settings from '../settings';
+import * as settings from './settings';
 import * as url from "url";
+import express from "express";
+import http from 'http';
 
+/**
+ * ----------------------------------------------------------------------------
+ * Connect to Redis
+ * ----------------------------------------------------------------------------
+ */
 var redis = null;
 if (process.env.REDISTOGO_URL) {
     var rtg = url.parse(process.env.REDISTOGO_URL);
@@ -19,9 +26,22 @@ if (process.env.REDISTOGO_URL) {
     });
 }
 
-var io = socket.listen('8000', { origins: '*:*' });
+/**
+ * ----------------------------------------------------------------------------
+ * Configure the socket server
+ * ----------------------------------------------------------------------------
+ */
+var app = express();
+var srv = http.createServer(app);
+var io = socket(srv, { origins: '*:*' });
 var ww = new Werewolves(redis);
 
+// Test route, to check that the server is up.
+app.get('/', (req, res) => {
+    res.send('Socket server')
+});
+
+// Handle socket messages.
 io.on("connection", (socket) => {
 
     var player = null;
@@ -42,4 +62,13 @@ io.on("connection", (socket) => {
         if (player != null) ww.vote(player, option);
     });
 
+});
+
+/**
+ * ----------------------------------------------------------------------------
+ * Start the socket server
+ * ----------------------------------------------------------------------------
+ */
+srv.listen(8000, () => {
+    console.log('listening on *:8000');
 });

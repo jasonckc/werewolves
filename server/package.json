@@ -13,6 +13,7 @@
   "dependencies": {
     "async-lock": "^1.2.4",
     "debug": "~2.6.9",
+    "express": "^4.17.1",
     "nodemon": "^2.0.4",
     "shortid": "^2.2.15",
     "socket.io": "^2.3.0",
