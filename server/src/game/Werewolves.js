@@ -2,7 +2,7 @@ import GameManager from "./managers/GameManager";
 import PlayerManager from "./managers/PlayerManager";
 import PollManager from "./managers/PollManager";
 import AsyncLock from "async-lock";
-import { Tedis } from "tedis";
+import { Tedis, TedisPool } from "tedis";
 
 /**
  * The main class of the Werewolves game.
@@ -22,6 +22,7 @@ class Werewolves {
         this._redisCredentials = redisCredentials;
 
         this._lock = new AsyncLock();
+        this._redisPool = new TedisPool(redisCredentials);
     }
 
     /**
@@ -29,8 +30,8 @@ class Werewolves {
      *
      * @returns An instance of Tedis.
      */
-    get redis() {
-        return new Tedis(this._redisCredentials);
+    async redis() {
+        return await this._redisPool.getTedis();
     }
 
     /**

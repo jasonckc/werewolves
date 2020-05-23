@@ -28,7 +28,8 @@ class PlayerManager {
      */
     async create(username, socket) {
         // Load the last player identifier.
-        var lastId = await this.app.redis
+        var redis = await this.app.redis();
+        var lastId = await redis
             .get('PlayerManager_Id')
             .catch((err) => { console.error(err); });
 
@@ -40,7 +41,8 @@ class PlayerManager {
         player.username = username;
 
         // Save the last player identifier
-        await this.app.redis
+        var redis = await this.app.redis();
+        await redis
             .setex('PlayerManager_Id', settings.OBJECT_LIFESPAN, player.id)
             .catch((err) => { console.error(err); });
 

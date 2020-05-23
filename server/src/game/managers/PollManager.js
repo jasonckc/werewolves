@@ -19,7 +19,8 @@ class PollManager {
 
     async create() {
         // Load the last poll identifier.
-        var lastId = await this.app.redis
+        var redis = await this.app.redis();
+        var lastId = await redis
             .get('PollManager_Id')
             .catch((err) => { console.error(err); });
 
@@ -30,7 +31,8 @@ class PollManager {
         poll.id = lastId + 1;
 
         // Save the last poll identifier
-        this.app.redis
+        var redis = await this.app.redis();
+        await redis
             .setex('PollManager_Id', settings.OBJECT_LIFESPAN, poll.id)
             .catch((err) => { console.error(err); });
 
@@ -63,7 +65,8 @@ class PollManager {
      */
     async synchronize(poll) {
         // Get the poll from redis.
-        var value = await this.app.redis
+        var redis = await this.app.redis();
+        var value = await redis
             .get('Poll_' + poll.id)
             .catch((err) => { console.error(err); value = null; });
 
@@ -93,7 +96,8 @@ class PollManager {
         var val = poll.serialize();
 
         var success = true;
-        await this.app.redis
+        var redis = await this.app.redis();
+        await redis
             .setex(key, settings.OBJECT_LIFESPAN, val)
             .catch(() => { success = false; });
 

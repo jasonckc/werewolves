@@ -67,7 +67,8 @@ class GameManager {
      */
     async synchronize(game) {
         // Get the game from redis.
-        var value = await this.app.redis
+        var redis = await this.app.redis();
+        var value = await redis
             .get('Game_' + game.id)
             .catch((err) => { console.error(err); value = null; });
 
@@ -97,7 +98,8 @@ class GameManager {
         var val = game.serialize();
 
         var success = true;
-        await this.app.redis
+        var redis = await this.app.redis();
+        await redis
             .setex(key, settings.OBJECT_LIFESPAN, val)
             .catch(() => { success = false; });
 
