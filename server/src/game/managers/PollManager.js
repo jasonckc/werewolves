@@ -15,6 +15,7 @@ class PollManager {
     constructor(app) {
         this.app = app;
         this._lastId = null;
+        this.instances = {};
     }
 
     async create() {
@@ -54,9 +55,17 @@ class PollManager {
             return null;
         }
 
-        var poll = new Poll(this.app);
-        poll.id = id;
-        return await this.synchronize(poll) ? poll : null;
+        if (this.instances[id] === null) {
+            this.instances[id] = new Poll(this.app);
+            this.instances[id].id = id;
+        }
+
+        if (this.synchronize(this.instances[id])) {
+            return this.instances[id];
+        }
+
+        delete this.instances[id]
+        return null;
     }
 
     /**

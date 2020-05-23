@@ -16,6 +16,7 @@ class GameManager {
      */
     constructor(app) {
         this.app = app;
+        this.instances = {};
     }
 
     /**
@@ -42,9 +43,17 @@ class GameManager {
             return null;
         }
 
-        var game = new Game(this.app);
-        game.id = id;
-        return await this.synchronize(game) ? game : null;
+        if (this.instances[id] === null) {
+            this.instances[id] = new Game(this.app);
+            this.instances[id].id = id;
+        }
+
+        if (this.synchronize(this.instances[id])) {
+            return this.instances[id];
+        }
+
+        delete this.instances[id]
+        return null;
     }
 
     /**
