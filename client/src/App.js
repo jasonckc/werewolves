@@ -12,7 +12,6 @@ function App() {
 
 	// Connect to the socket server.
 	const gameSocket = io(window.location.hostname + ":8000");
-	console.log(window.location.hostname + ":8000")
 	setSocket(gameSocket);
 
 	// Render the page.
