@@ -33,6 +33,8 @@ class PlayerManager {
             .get('PlayerManager_Id')
             .catch((err) => { console.error(err); });
 
+        redis.close();
+
         lastId = lastId === null ? 0 : parseInt(lastId);
 
         // Instanciate the player object.
@@ -51,6 +53,8 @@ class PlayerManager {
             this._socketByPlayerId[player.id] = socket;
             socket.on('disconnect', () => { this._onDisconnect(player); });
         }
+
+        redis.close();
 
         // Return the player.
         return player;

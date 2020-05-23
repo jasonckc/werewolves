@@ -33,17 +33,6 @@ class GameManager {
     }
 
     /**
-     * Deletes a game.
-     *
-     * @param {Game} game The game to delete.
-     */
-    async delete(game) {
-        await this.app.redis
-            .del('Game_' + game.id)
-            .catch((err) => { console.error(err); })
-    }
-
-    /**
      * Searches a game with the given identifier.
      *
      * @param {string} id The game identifier.
@@ -71,6 +60,8 @@ class GameManager {
         var value = await redis
             .get('Game_' + game.id)
             .catch((err) => { console.error(err); value = null; });
+
+        redis.close();
 
         // The game doesn't exist.
         if (value == null) {
@@ -103,6 +94,7 @@ class GameManager {
             .setex(key, settings.OBJECT_LIFESPAN, val)
             .catch(() => { success = false; });
 
+        redis.close();
         return success;
     }
 }

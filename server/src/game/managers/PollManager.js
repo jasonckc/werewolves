@@ -24,6 +24,7 @@ class PollManager {
             .get('PollManager_Id')
             .catch((err) => { console.error(err); });
 
+        redis.close();
         lastId = lastId === null ? 0 : parseInt(lastId);
 
         // Instanciate the poll
@@ -35,6 +36,8 @@ class PollManager {
         await redis
             .setex('PollManager_Id', settings.OBJECT_LIFESPAN, poll.id)
             .catch((err) => { console.error(err); });
+
+        redis.close();
 
         // Save the poll
         this.save(poll);
@@ -70,6 +73,8 @@ class PollManager {
             .get('Poll_' + poll.id)
             .catch((err) => { console.error(err); value = null; });
 
+        redis.close();
+
         // The poll doesn't exist.
         if (value == null) {
             return false;
@@ -101,6 +106,7 @@ class PollManager {
             .setex(key, settings.OBJECT_LIFESPAN, val)
             .catch(() => { success = false; });
 
+        redis.close();
         return success;
     }
 }
