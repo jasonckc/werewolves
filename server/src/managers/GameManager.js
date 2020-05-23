@@ -12,15 +12,11 @@ class GameManager {
     /**
      * Initializes the game manager.
      *
-     * @param {Werewolves} app The application.
+     * @param {Tedis}      redis The connection to redis.
+     * @param {Werewolves} app   The application.
      */
-    constructor(app) {
-        // Connect to redis.
-        this._redis = new Tedis({
-            port: settings.REDIS_PORT,
-            host: settings.REDIS_HOST
-        });
-
+    constructor(app, redis) {
+        this._redis = redis;
         this.app = app;
     }
 

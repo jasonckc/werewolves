@@ -1,8 +1,25 @@
 import Werewolves from './src/Werewolves';
 import socket from "socket.io";
+import { Tedis } from "tedis";
+import * as settings from '../settings';
+import * as url from "url";
+
+var redis = null;
+if (process.env.REDISTOGO_URL) {
+    redis = new Tedis({
+        host: rtg.hostname,
+        port: rtg.port,
+        password: rtg.auth.split(":")[1]
+    });
+} else {
+    redis = new Tedis({
+        host: settings.DEFAULT_REDIS_HOST,
+        port: settings.DEFAULT_REDIS_PORT
+    });
+}
 
 var io = socket.listen('8000');
-var ww = new Werewolves();
+var ww = new Werewolves(redis);
 
 io.on("connection", (socket) => {
 

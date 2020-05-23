@@ -11,16 +11,12 @@ class PlayerManager {
     /**
      * Initializes the player manager.
      *
-     * @param {Werewolves} app The application.
+     * @param {Tedis}      redis The connection to redis.
+     * @param {Werewolves} app   The application.
      */
-    constructor(app) {
+    constructor(redis, app) {
         // Connect to redis.
-        this._redis = new Tedis({
-            port: settings.REDIS_PORT,
-            host: settings.REDIS_HOST
-        });
-
-        // Initialize other attributes
+        this._redis = redis;
         this.app = app;
         this._socketByPlayerId = {};
     }

@@ -14,7 +14,7 @@ function App() {
 	const { setSocket } = useStoreActions((actions) => actions.game);
 
 	// Connect to the socket server.
-	const gameSocket = socketIOClient("http://127.0.0.1:8000");
+	const gameSocket = socketIOClient("https://werewolves-game.herokuapp.com:8000/");
 	setSocket(gameSocket);
 
 	// Render the page.
