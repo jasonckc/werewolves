@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { Redirect } from "react-router-dom";
 import { useStoreState, useStoreActions } from "easy-peasy";
 import styled from "styled-components";
+import { useLocation } from "react-router-dom";
 
 import { Container, Grid, Typography, Card, CardHeader, CardBody, Button, CardFooter, Divider, Image } from "../atoms";
 
@@ -26,6 +27,7 @@ const Lobby = () => {
 
 	// Listen to player-joined and re-render
 	useEffect(() => {
+
 		socket.on("player-joined", (player) => {
 			addPlayer(player);
 			update({
@@ -58,7 +60,7 @@ const Lobby = () => {
 
 	// Copy link onClick handler
 	const copyLinkHandler = () => {
-		navigator.clipboard.writeText(`http://localhost:3000/join-game/${id}`);
+		navigator.clipboard.writeText(`${window.location.host}/join-game/${id}`);
 		update({
 			message: "Copied!",
 			variant: "success"
@@ -88,8 +90,8 @@ const Lobby = () => {
 								Room code: {id}
 							</Typography>
 							<Typography variant="link" onClick={copyLinkHandler}>
-								<Image src={link} width={25} height={25}/> 
-								{`http://localhost:3000/join-game/${id}`}
+								<Image src={link} width={25} height={25} />
+								{`${window.location.host}/join-game/${id}`}
 							</Typography>
 						</CardHeader>
 						<Divider />

@@ -1,7 +1,6 @@
 import "core-js/stable";
 import "regenerator-runtime/runtime";
 import socket from "socket.io";
-import { Tedis } from "tedis";
 import * as settings from './settings';
 import * as url from "url";
 import express from "express";
