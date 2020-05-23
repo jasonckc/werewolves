@@ -12,8 +12,7 @@ class PollManager {
      *
      * @param {Werewolves} app The application.
      */
-    constructor(app, redis) {
-        this.app.redis = redis;
+    constructor(app) {
         this.app = app;
         this._lastId = null;
     }
