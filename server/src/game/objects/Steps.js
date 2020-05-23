@@ -15,9 +15,61 @@ class Steps {
     }
 
     /**
+     * Handles the result of a poll.
+     *
+     * @param {string} result The result of the poll.
+     */
+    async onPollEnded(result) {
+        switch (this.game.step) {
+            case 'assignRoles':
+                await this.night();
+                break;
+
+            case 'night':
+            case 'day':
+                // Kill the victim. Send the username and the role of the
+                // victim to all players.
+                var victim = this.game.players[result];
+                if (victim != null) {
+                    victim.isAlive = false;
+                    this.game.broadcast('player-died', victim.username, victim.role);
+                }
+
+                // If there is a winner, end the game.
+                if (this.game.winners !== null) {
+                    await this.end();
+                    break;
+                }
+
+                // Next step.
+                if (this.game.step === 'night') await this.day();
+                else await this.night();
+
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Starts the game.
+     */
+    async start() {
+        this.game.step = 'start';
+        this.game.app.games.save(this.game);
+
+        this.game.broadcast('game-started');
+        this.assignRoles();
+    }
+
+    /**
      * Assigns a random role to each players and notifies them.
      */
     async assignRoles() {
+        this.game.step = 'assignRoles';
+        this.game.app.games.save(this.game);
+
         var nbPlayers = Object.keys(this.game.players).length;
 
         // Determine the number of werewolves.
@@ -58,62 +110,58 @@ class Steps {
             var role = player.role;
             this.game.broadcastTo(showRole, 'player-role', username, role);
         });
-    }
 
-    /**
-     * Waits until all players acknowledge their roles by voting 'ready'.
-     */
-    async waitRoleAcknowlegement() {
-        await this.game.startPoll(['ready']);
+        // The player must acknowledge their roles.
+        this.game.startPoll(['ready']);
     }
 
     /**
      * Night phase: the werewolves must choose a player to eliminate.
      */
     async night() {
+        this.game.step = 'night';
+        this.game.app.games.save(this.game);
+
         // Run a poll. The options are the usernames of all alive players. The
         // voters are the werewolves.
         var options = [];
         var alivePlayers = this.game.getPlayers((p) => { return p.isAlive; });
         alivePlayers.forEach((p) => { options.push(p.username); })
 
-        // Get the player with the most votes.
-        var victimUsername = await this.game.startPoll(options, (p) => {
+        // Start a poll to eliminate a player.
+        this.game.startPoll(options, (p) => {
             return p.isAlive && p.role === 'werewolf';
         });
-
-
-        // Kill the victim. Send the username and the role of the victim to all
-        // players.
-        var victim = this.game.players[victimUsername];
-        if (victim != null) {
-            victim.isAlive = false;
-            this.game.broadcast('player-died', victim.username, victim.role);
-        }
     }
 
     /**
      * Day phase: the players must select a player to eliminate.
      */
     async day() {
+        this.game.step = 'day';
+        this.game.app.games.save(this.game);
+
         // Run a poll. The options are the usernames of all alive players. All
         // alive players can vote.
         var options = [];
         var alivePlayers = this.game.getPlayers((p) => { return p.isAlive; });
         alivePlayers.forEach((p) => { options.push(p.username); })
 
-        // Get the player with the most votes.
-        var victimUsername = await this.game.startPoll(options, (p) => {
+        // Start a poll to eliminate a player.
+        this.game.startPoll(options, (p) => {
             return p.isAlive;
         });
+    }
 
-        // Kill the victim. Send the username and the role of the victim to all
-        // players.
-        var victim = this.game.players[victimUsername];
-        if (victim != null) {
-            victim.isAlive = false;
-            this.game.broadcast('player-died', victim.username, victim.role);
-        }
+    /**
+     * Ends the game.
+     */
+    async end() {
+        this.game.step = 'end';
+        this.game.app.games.save(this.game);
+
+        var playersList = Object.values(this.game.players);
+        this.game.broadcast('game-ended', this.game.winners, playersList);
     }
 }
 

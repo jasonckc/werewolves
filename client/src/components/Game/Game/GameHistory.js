@@ -18,6 +18,7 @@ const Wrapper = styled.div`
 		display: none;
 	}
 	-ms-overflow-style: none;
+	scrollbar-width: none;
 `;
 
 const GameHistory = () => {

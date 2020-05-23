@@ -15,6 +15,7 @@ const PlayerList = styled.div`
 		display: none;
 	};
 	-ms-overflow-style: none;
+	scrollbar-width: none;
 `;
 
 const Lobby = () => {

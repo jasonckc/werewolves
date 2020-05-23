@@ -21,6 +21,7 @@ class Game {
         this.players = {};
         this.owner = null;
         this.pollId = null;
+        this.step = null;
 
         if (string != null) {
             this.deserialize(string);
@@ -155,26 +156,9 @@ class Game {
      */
     async start() {
         // The minimum number of players is 6
-        if (Object.keys(this.players).length < 3) {
-            return;
+        if (Object.keys(this.players).length >= 6) {
+            this.steps.start();
         }
-
-        this.broadcast('game-started');
-
-        // Assign roles
-        this.steps.assignRoles();
-        await this.steps.waitRoleAcknowlegement();
-
-        // While not victory
-        while (this.winners == null) {
-            await this.steps.night();
-
-            if (this.winners == null) await this.steps.day();
-            else break;
-        }
-
-        var playersList = Object.values(this.players);
-        this.broadcast('game-ended', this.winners, playersList);
     }
 
     /**
@@ -185,12 +169,10 @@ class Game {
      *                                            if the player must be a voter
      *                                            or false otherwise.
      *
-     * @returns The option with the most votes. If no one voted, returns a
-     * random option. If there is a tie, returns a random option from among
-     * those with the most votes.
+     * @returns The poll.
      */
     async startPoll(options, filterPlayers = null) {
-        return await this.startTimedPoll(options, null, filterPlayers);
+        return this.startTimedPoll(options, null, filterPlayers);
     }
 
     /**
@@ -203,9 +185,7 @@ class Game {
      *                                            if the player must be a voter
      *                                            or false otherwise.
      *
-     * @returns The option with the most votes. If no one voted, returns a
-     * random option. If there is a tie, returns a random option from among
-     * those with the most votes.
+     * @returns The poll.
      */
     async startTimedPoll(options, timeLimit, filterPlayers = null) {
         var voters = [];
@@ -216,6 +196,10 @@ class Game {
         })
 
         var poll = await this.app.polls.create();
+
+        poll.gameId = this.id;
+        this.app.polls.save(poll);
+
         this.pollId = poll.id;
         this.app.games.save(this);
 
@@ -223,10 +207,8 @@ class Game {
         poll.voters = voters;
         poll.timeLimit = timeLimit;
 
-        await poll.start();
-        this.pollId = null;
-
-        return poll.result();
+        poll.start();
+        return poll;
     }
 
     /**
@@ -257,6 +239,18 @@ class Game {
     }
 
     /**
+     * Callback called when a poll associated to this game ends.
+     *
+     * @param {string} result The result of the poll.
+     */
+    async onPollEnded(result) {
+        this.pollId = null;
+        this.app.games.save(this);
+
+        this.steps.onPollEnded(result);
+    }
+
+    /**
      * Converts this object to an object that can be serialized as a JSON
      * string.
      *
@@ -274,7 +268,8 @@ class Game {
             id: this.id,
             players: players,
             owner: this.owner,
-            pollId: this.pollId
+            pollId: this.pollId,
+            step: this.step
         }
     }
 
@@ -305,6 +300,7 @@ class Game {
         this.id = obj.id;
         this.owner = obj.owner;
         this.pollId = obj.pollId;
+        this.step = obj.step;
 
         // Deserialize the players.
         obj.players.forEach((p) => {

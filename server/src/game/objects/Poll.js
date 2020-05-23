@@ -16,12 +16,12 @@ class Poll {
         this.app = app;
 
         this.id = null;
+        this.gameId = null;
+
         this._voters = [];
         this._options = [];
         this._timeLimit = null;
-
         this._votes = {};
-        this._inProgress = null;
 
         if (string !== null) {
             this.deserialize(string);
@@ -34,11 +34,8 @@ class Poll {
      * @param {string[]} options The options of the poll.
      */
     set options(options) {
-        // Do not set options if the poll is in progress.
-        if (!this._inProgress) {
-            this._options = options;
-            this.app.polls.save(this);
-        }
+        this._options = options;
+        this.app.polls.save(this);
     }
 
     /**
@@ -47,11 +44,6 @@ class Poll {
      * @param {Player[]} voters The list of voters.
      */
     set voters(voters) {
-        // Do not set voters if the poll is in progress.
-        if (this._inProgress) {
-            return;
-        }
-
         // Don't insert duplicates in the list of voters.
         voters.forEach((voter) => {
             if (!this._voters.includes(voter)) {
@@ -72,12 +64,6 @@ class Poll {
             if (v.id === voter.id) {
                 delete this._voters.splice(i, 1);
                 delete this._votes[voter.username];
-
-                if (this._inProgress) {
-                    var nbVotes = Object.keys(this._votes).length;
-                    this._inProgress = nbVotes < this._voters.length;
-                }
-
                 this.app.polls.save(this);
             }
         });
@@ -89,11 +75,8 @@ class Poll {
      * @param {number} seconds The time limit.
      */
     set timeLimit(seconds) {
-        // Do not set the time limit if the poll is in progress.
-        if (!this._inProgress) {
-            this._timeLimit = seconds;
-            this.app.polls.save(this);
-        }
+        this._timeLimit = seconds;
+        this.app.polls.save(this);
     }
 
     /**
@@ -103,10 +86,7 @@ class Poll {
      * @param {string} option The chosen option.
      */
     async vote(voter, option) {
-        // Cannot vote if the poll wasn't started.
-        if (!this._inProgress) {
-            return;
-        }
+        this.app.polls.synchronize(this);
 
         // Don't vote if the player isn't among the voters or if the chosen
         // option is invalid.
@@ -117,23 +97,26 @@ class Poll {
         // Register the vote. Close the poll if all voters voted.
         this._votes[voter.id] = option;
         var nbVotes = Object.keys(this._votes).length;
-        this._inProgress = nbVotes < this._voters.length;
-
-        await this.app.polls.save(this);
 
         // Notify the players
         this.broadcast('poll-voted', voter.username, option);
+
+        if (nbVotes >= this._voters.length) {
+            this.broadcast('poll-ended');
+            console.log(this._votes);
+
+            // Notify the game
+            var game = await this.app.games.get(this.gameId);
+            if (game != null) await game.onPollEnded(this.result());
+        }
+
+        await this.app.polls.save(this);
     }
 
     /**
      * Starts the poll. Returns when all players voted.
      */
     async start() {
-        // Cannot start a poll that was already started.
-        if (this._inProgress === true) {
-            return;
-        }
-
         // Cannot start a poll with no options.
         if (this._options.length == 0) {
             return;
@@ -144,22 +127,27 @@ class Poll {
             return;
         }
 
-        this._inProgress = true;
         await this.app.polls.save(this);
 
         // Notify all the voters that the voted has started.
         this.broadcast('poll-started', this.toJSON());
 
-        // Configure the promise's executor function.
-        var executor = (resolve) => {
-            if (this._timeLimit === null) this._waitAllVoters(resolve);
-            else setTimeout(resolve, this._timeLimit * 1000);
-        };
+        // Time limit.
+        if (this._timeLimit !== null) {
+            return new Promise(async (resolve) => {
+                await setTimeout(resolve, this._timeLimit * 1000);
+                this.broadcast('poll-ended');
 
-        // Return the promise.
-        return new Promise(executor)
-            .then(() => { this._inProgress = false; this.app.polls.save(this); })
-            .then(() => { this.broadcast('poll-ended'); });
+                // Notify the game
+                var game = await this.app.games.get(this.gameId);
+                if (game != null) game.onPollEnded(this.result());
+
+                resolve();
+            });
+        }
+
+        // No time limit.
+        return new Promise((resolve) => { resolve(); });
     }
 
     /**
@@ -167,11 +155,6 @@ class Poll {
      * random option among the winners.
      */
     result() {
-        // The result is null if the poll is still running or wasn't started.
-        if (this._inProgress === null || this._inProgress === true) {
-            return null;
-        }
-
         // Compute the number of votes for each option.
         var nbVotesByOption = {};
         this._options.forEach((option) => { nbVotesByOption[option] = 0; });
@@ -242,8 +225,8 @@ class Poll {
             options: this._options,
             timeLimit: this._timeLimit,
             voters: voters,
-            inProgress: this._inProgress,
-            votes: this._votes
+            votes: this._votes,
+            gameId: this.gameId
         };
     }
 
@@ -275,33 +258,12 @@ class Poll {
         })
 
         this.id = obj.id;
+        this.gameId = obj.gameId;
         this._options = obj.options;
         this._timeLimit = obj.timeLimit;
-        this._inProgress = obj.inProgress;
         this._votes = obj.votes;
 
         return this;
-    }
-
-    /**
-     * Method that loops until all players voted.
-     *
-     * @param {() => void} callback      A function to call when the vote is
-     *                                   over.
-     * @param {number}     pollFrequency The polling frequency in milliseconds.
-     */
-    async _waitAllVoters(callback, pollFrequency = 5) {
-        // Synchronize the poll to get the latest data.
-        await this.app.polls.synchronize(this);
-
-        // Determine whether the poll is over or not.
-        if (!this._inProgress) {
-            callback();
-        } else {
-            setTimeout(() => {
-                this._waitAllVoters(callback, pollFrequency);
-            }, pollFrequency);
-        }
     }
 
     /**
