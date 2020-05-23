@@ -6,6 +6,7 @@ import * as url from "url";
 
 var redis = null;
 if (process.env.REDISTOGO_URL) {
+    var rtg = url.parse(process.env.REDISTOGO_URL);
     redis = new Tedis({
         host: rtg.hostname,
         port: rtg.port,
