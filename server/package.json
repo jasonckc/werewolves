@@ -21,9 +21,7 @@
     "rimraf": "^3.0.2",
     "shortid": "^2.2.15",
     "socket.io": "^2.3.0",
-    "tedis": "^0.1.12"
-  },
-  "devDependencies": {
+    "tedis": "^0.1.12",
     "@babel/cli": "^7.8.4",
     "@babel/core": "^7.9.6",
     "@babel/node": "^7.8.7",
