@@ -10,18 +10,17 @@ class PollManager {
     /**
      * Initializes the poll manager.
      *
-     * @param {Werewolves} app   The application.
-     * @param {Tedis}      redis The connection to redis.
+     * @param {Werewolves} app The application.
      */
     constructor(app, redis) {
-        this._redis = redis;
+        this.app.redis = redis;
         this.app = app;
         this._lastId = null;
     }
 
     async create() {
         // Load the last poll identifier.
-        var lastId = await this._redis
+        var lastId = await this.app.redis
             .get('PollManager_Id')
             .catch((err) => { console.error(err); });
 
@@ -32,7 +31,7 @@ class PollManager {
         poll.id = lastId + 1;
 
         // Save the last poll identifier
-        this._redis
+        this.app.redis
             .setex('PollManager_Id', settings.OBJECT_LIFESPAN, poll.id)
             .catch((err) => { console.error(err); });
 
@@ -65,7 +64,7 @@ class PollManager {
      */
     async synchronize(poll) {
         // Get the poll from redis.
-        var value = await this._redis
+        var value = await this.app.redis
             .get('Poll_' + poll.id)
             .catch((err) => { console.error(err); value = null; });
 
@@ -95,7 +94,7 @@ class PollManager {
         var val = poll.serialize();
 
         var success = true;
-        await this._redis
+        await this.app.redis
             .setex(key, settings.OBJECT_LIFESPAN, val)
             .catch(() => { success = false; });
 

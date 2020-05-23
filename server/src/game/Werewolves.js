@@ -11,14 +11,25 @@ class Werewolves {
     /**
      * Initializes the game.
      *
-     * @param {Tedis} redis The connection to redis.
+     * @param {object} redisCredentials The redis credentials.
      */
-    constructor(redis) {
-        this.games = new GameManager(this, redis);
-        this.players = new PlayerManager(this, redis);
-        this.polls = new PollManager(this, redis);
+    constructor(redisCredentials) {
+        this.games = new GameManager(this);
+        this.players = new PlayerManager(this);
+        this.polls = new PollManager(this);
+
+        this._redisCredentials = redisCredentials;
 
         this._lock = new AsyncLock();
+    }
+
+    /**
+     * Returns a connection to redis.
+     *
+     * @returns An instance of Tedis.
+     */
+    get redis() {
+        return new Tedis(this._redisCredentials);
     }
 
     /**

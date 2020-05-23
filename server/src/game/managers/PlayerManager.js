@@ -11,11 +11,9 @@ class PlayerManager {
     /**
      * Initializes the player manager.
      *
-     * @param {Werewolves} app   The application.
-     * @param {Tedis}      redis The connection to redis.
+     * @param {Werewolves} app The application.
      */
-    constructor(app, redis) {
-        this._redis = redis;
+    constructor(app) {
         this.app = app;
         this._socketByPlayerId = {};
     }
@@ -30,7 +28,7 @@ class PlayerManager {
      */
     async create(username, socket) {
         // Load the last player identifier.
-        var lastId = await this._redis
+        var lastId = await this.app.redis
             .get('PlayerManager_Id')
             .catch((err) => { console.error(err); });
 
@@ -42,7 +40,7 @@ class PlayerManager {
         player.username = username;
 
         // Save the last player identifier
-        await this._redis
+        await this.app.redis
             .setex('PlayerManager_Id', settings.OBJECT_LIFESPAN, player.id)
             .catch((err) => { console.error(err); });
 

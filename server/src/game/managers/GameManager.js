@@ -12,11 +12,9 @@ class GameManager {
     /**
      * Initializes the game manager.
      *
-     * @param {Werewolves} app   The application.
-     * @param {Tedis}      redis The connection to redis.
+     * @param {Werewolves} app The application.
      */
-    constructor(app, redis) {
-        this._redis = redis;
+    constructor(app) {
         this.app = app;
     }
 
@@ -40,7 +38,7 @@ class GameManager {
      * @param {Game} game The game to delete.
      */
     async delete(game) {
-        await this._redis
+        await this.app.redis
             .del('Game_' + game.id)
             .catch((err) => { console.error(err); })
     }
@@ -69,7 +67,7 @@ class GameManager {
      */
     async synchronize(game) {
         // Get the game from redis.
-        var value = await this._redis
+        var value = await this.app.redis
             .get('Game_' + game.id)
             .catch((err) => { console.error(err); value = null; });
 
@@ -99,7 +97,7 @@ class GameManager {
         var val = game.serialize();
 
         var success = true;
-        await this._redis
+        await this.app.redis
             .setex(key, settings.OBJECT_LIFESPAN, val)
             .catch(() => { success = false; });
 

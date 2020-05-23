@@ -14,20 +14,19 @@ import path from "path";
  * Connect to Redis
  * ----------------------------------------------------------------------------
  */
-var redis = null;
+var redisCredentials = null;
 if (process.env.REDISTOGO_URL) {
     var rtg = url.parse(process.env.REDISTOGO_URL);
-    console.log(rtg);
-    redis = new Tedis({
+    redisCredentials = {
         host: rtg.hostname,
         port: rtg.port,
         password: rtg.auth.split(":")[1]
-    });
+    };
 } else {
-    redis = new Tedis({
+    redisCredentials = {
         host: settings.DEFAULT_REDIS_HOST,
         port: settings.DEFAULT_REDIS_PORT
-    });
+    };
 }
 
 /**
@@ -38,7 +37,7 @@ if (process.env.REDISTOGO_URL) {
 var app = express();
 var srv = http.createServer(app);
 var io = socket(srv, { origins: '*:*' });
-var ww = new Werewolves(redis);
+var ww = new Werewolves(redisCredentials);
 
 // Serve the react app.
 app.use(express.static(path.join(__dirname, '/../../client/build')));
